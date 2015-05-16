@@ -6,14 +6,14 @@ var INSERT = "INSERT INTO Comparison VALUES (?,?,?,?);";
 var GET = "	SELECT Result,Offset,Short FROM Comparison WHERE Films = ?;";
 var CREATE = "	CREATE TABLE Comparison (Films varchar(255), Result float, Offset int, PRIMARY KEY (Films), Short varchar(255));";
 
-exports.openPool = function() {
-    connection = mysql.createConnection({
+exports.openPool = function() {/*
+  connection = mysql.createConnection({
         host: 'localhost',
         user: 'root',
         password: '',
         database: 'Vult'
     });
-    connection.connect();
+    connection.connect();*/
 }
 
 exports.closePool = function() {
