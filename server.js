@@ -3,9 +3,7 @@ var mysql = require('mysql');
 var alg = require('./algorithm');
 var movies = require('./movies');
 var app = express();
-var movieName = 'Pocahontas';
 var scripts = require('./scripts/app.js');
-
 
 app.get('/', function (req, res) {
   res.sendfile(__dirname + '/index.html');
@@ -16,12 +14,20 @@ app.get('/styles.css', function (req, res) {
 });
 
 app.get('/getRecommendedMovies', function(req, res) {
-  alg.getResult('furious', 'chappie', function(result) {
-    res.send(result);
-  });
+  var data = [];
+  var length = movies.movies.length;
   for (var i = 0; i < movies.movies.length ; i++) {
     movieName = movies.movies[i];
-    scripts.init(movieName);
+    alg.getResult(req.query.film, movieName, function(result) {
+      if (result == undefined) {
+        length--;
+      } else {
+          data[data.length] = result;
+      }
+      if (data.length == length) {
+        res.end(JSON.stringify(data));
+      }
+    });
   }
 });
 
