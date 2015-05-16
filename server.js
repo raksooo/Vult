@@ -15,11 +15,16 @@ app.get('/styles.css', function (req, res) {
 
 app.get('/getRecommendedMovies', function(req, res) {
   var data = [];
+  var length = movies.movies.length;
   for (var i = 0; i < movies.movies.length ; i++) {
     movieName = movies.movies[i];
     alg.getResult(req.query.film, movieName, function(result) {
-      data[data.length] = result;
-      if (data.length == movies.movies.length) {
+      if (result == undefined) {
+        length--;
+      } else {
+          data[data.length] = result;
+      }
+      if (data.length == length) {
         res.end(JSON.stringify(data));
       }
     });
