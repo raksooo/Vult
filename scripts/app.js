@@ -11,7 +11,10 @@ var fs = require('fs');
 //var imdb = require('imdb-api');
 
 var app = function(movieName, cB) {
+try {
+
   //var $ = require('jquery')(window);
+  //
   var data = {
     //searchMovie: searchMovie,
     init: init,
@@ -266,4 +269,6 @@ var app = function(movieName, cB) {
 
     return buffer;
   }
+}
+catch (err) {}
 };
