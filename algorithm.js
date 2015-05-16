@@ -7,10 +7,6 @@ var BIT_LENGTH = 1000;
 
 db.openPool();
 
-getResult('twilight', 'kingsman', function(result) {
-    console.log(result);
-});
-
 function getResult(film1, film2, callback) {
 	var subs = getSubtitles(film1, film2);
 
