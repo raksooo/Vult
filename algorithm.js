@@ -1,10 +1,10 @@
 var fs = require('fs');
 
 var DATE = '1970-01-01';
-var BITS_PER_POSITION = 14;
+var BITS_PER_POSITION = 2; //offsetintervals
 
-fs.readFile(__dirname + "/example_subtitle/exMachina.srt", function(err, sub1) {
-    fs.readFile(__dirname + "/example_subtitle/chappie.srt", function(err, sub2) {
+fs.readFile(__dirname + "/example_subtitle/kingsman.srt", function(err, sub1) {
+    fs.readFile(__dirname + "/example_subtitle/twilight.srt", function(err, sub2) {
         sub1 = toBinary(parseSubtitle(sub1), 1000);
         sub2 = toBinary(parseSubtitle(sub2), 1000);
         result = calculateOverlap(sub1, sub2);
@@ -44,7 +44,6 @@ function calculateOverlap(sub1, sub2) {
             best = v;
             offset = i;
         }
-        console.log({overlap: v, offset: i});
     }
 
     return {overlap: best, offset: offset};
