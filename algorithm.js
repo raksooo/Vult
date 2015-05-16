@@ -1,26 +1,24 @@
 var fs = require('fs');
-var db = require('databaseHandler');
+var db = require('./databaseHandler');
 
 var DATE = '1970-01-01';
 var BITS_PER_POSITION = 2; //offsetintervals
+var BIT_LENGTH = 1000;
 
-getResult('kingsman', 'twilight');
+db.openPool();
 
-function getResult(film1, film2) {
+exports.getResult = function(film1, film2, callback) {
 	var subs = getSubtitles(film1, film2);
 
-	db.getResult(film1, film2, function(result, offset) {
+	db.getResult(film1, film2, function(result, offset, shortFilm) {
 		if (result !== undefined) {
-			return {overlap: result, offset: offset};
+			callback({overlap: result, offset: offset, shortFilm: shortFilm});
 		} else {
-			toBinary(parseSubtitle(subs.film1), 1000, film1, film2, function(sub1) {
-				toBinary(parseSubtitle(subs.film2), 1000, film1, film2, function(sub2) {
-				    result = calculateOverlap(sub1, sub2, film1, film2);
-				    console.log(result);
+			var sub1 = toBinary(parseSubtitle(subs.film1), BIT_LENGTH);
+		    var sub2 = toBinary(parseSubtitle(subs.film2), BIT_LENGTH);
+            result = calculateOverlap(sub1, sub2, film1, film2);
 
-				    return result;
-				});
-			});
+            callback(result);
 		}
 	});
 }
@@ -29,7 +27,7 @@ function getSubtitles(film1, film2) {
 	var kingsman = fs.readFileSync(__dirname + "/example_subtitle/kingsman.srt");
 	var twilight = fs.readFileSync(__dirname + "/example_subtitle/twilight.srt");
 
-	return {film1: kingsman, film2: twilight};
+	return {film1: twilight, film2: kingsman};
 }
 
 function compare(longer, shorter, offset) {
@@ -46,12 +44,15 @@ function compare(longer, shorter, offset) {
 
 function calculateOverlap(sub1, sub2, film1, film2) {
     var longer, shorter;
+    var shortFilm;
     if (sub1.length > sub2.length) {
         longer = sub1;
         shorter = sub2;
+        shortFilm = film2;
     } else {
         longer = sub2;
         shorter = sub1;
+        shortFilm = film1;
     }
 
     var least = Math.min(calculateLines(shorter), calculateLines(longer));
@@ -66,9 +67,9 @@ function calculateOverlap(sub1, sub2, film1, film2) {
         }
     }
 
-    db.insertResult(film1, film2, best, offset);
+    db.insertResult(film1, film2, best, offset, shortFilm);
 
-    return {overlap: best, offset: offset};
+    return {overlap: best, shorter: shortFilm, offset: offset};
 }
 
 function calculateLines(lines) {
