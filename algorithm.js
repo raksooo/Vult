@@ -28,7 +28,7 @@ exports.getResult = function(film1, film2, callback) {
 var scripts = require('./scripts/app.js');
 
 function getSubtitles(film1, callback) {
-    scripts.init(movieName, callback);
+    scripts.init(film1, callback);
 }
 
 function compare(longer, shorter, offset) {
