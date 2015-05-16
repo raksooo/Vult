@@ -1,34 +1,24 @@
-var fs = require('fs');
 var db = require('./databaseHandler');
-
-var DATE = '1970-01-01';
-var BITS_PER_POSITION = 6; //offsetintervals
-var BIT_LENGTH = 1000;
+var subs = require('./subtitles.js');
 
 db.openPool();
 
 exports.getResult = function(film1, film2, callback) {
 	db.getResult(film1, film2, function(result, offset, shortFilm) {
 		if (result !== undefined) {
-			callback({overlap: result, offset: offset*BITS_PER_POSITION, shortFilm: shortFilm, film1: film1, film2: film2});
+			callback({overlap: result, offset: offset*subs.BITS_PER_POSITION, shortFilm: shortFilm, film1: film1, film2: film2});
 		} else {
-      parseSubtitle(film1, function(parsed1) {
-        parseSubtitle(film2, function(parsed2) {
-        var sub1 = toBinary(parsed1, BIT_LENGTH);
-		    var sub2 = toBinary(parsed2, BIT_LENGTH);
-            result = calculateOverlap(sub1, sub2, film1, film2);
+            subs.parseSubtitle(film1, function(parsed1) {
+                subs.parseSubtitle(film2, function(parsed2) {
+                    var sub1 = subs.toBinary(parsed1, subs.BIT_LENGTH);
+                    var sub2 = subs.toBinary(parsed2, subs.BIT_LENGTH);
+                    result = calculateOverlap(sub1, sub2, film1, film2);
 
-            callback(result);
-        });
-      });
-		}
+                    callback(result);
+                });
+            });
+        }
 	});
-}
-
-var scripts = require('./scripts/app.js');
-
-function getSubtitles(film1, callback) {
-    scripts.init(film1, callback);
 }
 
 function compare(longer, shorter, offset) {
@@ -58,7 +48,7 @@ function calculateOverlap(sub1, sub2, film1, film2) {
 
     var least = Math.min(calculateLines(shorter), calculateLines(longer));
     var best = 1;
-    var offset = -1;
+    var offset = 0;
     for (var i=0; shorter.length+i<=longer.length; i++) {
         var v = calculateLines(compare(longer, shorter, i));
         v /= least;
@@ -69,8 +59,7 @@ function calculateOverlap(sub1, sub2, film1, film2) {
     }
 
     db.insertResult(film1, film2, best, offset, shortFilm);
-
-    return {overlap: best, shorter: shortFilm, offset: offset*BITS_PER_POSITION, film1: film1, film2: film2};
+    return {overlap: best, shorter: shortFilm, offset: offset*subs.BITS_PER_POSITION, film1: film1, film2: film2};
 }
 
 function calculateLines(lines) {
@@ -89,87 +78,5 @@ function calculateLines(lines) {
     });
 
     return line;
-}
-
-function parseSubtitle(film, callback) {
-  getSubtitles(film, function(subtitle) {
-
-	var lines = subtitle.toString().split('\n');
-	var intervals = [];
-	var lastEmpty = true;
-	var correctLine = false;
-
-	lines.some(function(line) {
-		line = line.trim();
-		if (correctLine) {
-			correctLine = false;
-			intervals.push(parseInterval(line));
-		} else if (!line.length) {
-			lastEmpty = true;
-		} else if (lastEmpty && line%1 === 0) {
-			correctLine = true;
-			lastEmpty = false;
-        }
-	});
-
-  callback(intervals);
-  });
-}
-
-function parseInterval(interval) {
-	var array = interval.split(' ');
-	interval = {};
-	interval.start = parseTime(array[0]);
-	interval.end = parseTime(array[2]);
-
-	return interval;
-}
-
-function parseTime(time) {
-    time = time.replace(',', ':');
-	var parsed = (Date.parse(DATE + " " + time) + 60*60*1000);
-    return parsed;
-}
-
-function toBinary(intervals, bitLength) {
-	var current = 1;
-	var binary = [current];
-	var previousEnd = 0;
-
-	intervals.forEach(function(interval) {
-		var noSub = Math.floor(interval.start / bitLength) - Math.ceil(previousEnd / bitLength);
-        noSub = noSub < 0 ? 0 : noSub;
-		var sub = Math.ceil(interval.end / bitLength) - Math.floor(interval.start / bitLength);
-		previousEnd = interval.end;
-
-		binary = binary.concat(addToBinary(binary.pop(), noSub, false));
-		binary = binary.concat(addToBinary(binary.pop(), sub, true));
-	});
-
-	return binary;
-}
-
-function addToBinary(binary, length, value) {
-	var binaryLength = Math.ceil(Math.log2(binary + 1));
-
-	if (length + binaryLength <= BITS_PER_POSITION) {
-		return [bitShift(binary, length, value)];
-	} else {
-		var spaceLeft = BITS_PER_POSITION - binaryLength;
-		var newBinaries = [bitShift(binary, spaceLeft, value)];
-        return newBinaries.concat(addToBinary(1, length-spaceLeft, value));
-	}
-}
-
-function bitShift(binary, length, value) {
-	if (value) {
-		for (var i = 0; i < length; i++) {
-			binary = (binary << 1) + 1;
-		}
-	} else {
-		binary = binary << length;
-	}
-
-	return binary;
 }
 
