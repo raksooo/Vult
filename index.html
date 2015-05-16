@@ -8,13 +8,45 @@
         		xmlhttp = new XMLHttpRequest();
 				xmlhttp.open("GET", "getRecommendedMovies?film=" + movie.value, false);
 				xmlhttp.send();
-				result = xmlhttp.responseXML;
+				result = JSON.parse(xmlhttp.response);
 				console.log(result);
+
+				var list = document.createElement("ul");
+				var offset = document.createElement("li");
+				var shortFilm = document.createElement("li");
+				var film1 = document.createElement("li");
+				var film2 = document.createElement("li");
+				var overlap = document.createElement("li");
+
+				offset.innerHTML = result.offset + 's';
+				shortFilm.innerHTML = result.shortFilm;
+				film1.innerHTML = result.film1;
+				film2.innerHTML = result.film2;
+				overlap.innerHTML = Math.round(result.overlap*100) + '%';
+
+				list.appendChild(overlap);
+				list.appendChild(film1);
+				list.appendChild(film2);
+				list.appendChild(shortFilm);
+				list.appendChild(offset);
+				
+				document.getElementById("result").appendChild(list);
         	}
         </script>
+        <!-- Styles -->
+    	<link rel="stylesheet" href="styles.css">
+    	<!-- Fonts -->
+        <link href='http://fonts.googleapis.com/css?family=Rajdhani:300|Josefin+Sans:100|Advent+Pro:100|Roboto:300' rel='stylesheet' type='text/css'>
     </head>
     <body>
-        <input type="text" id="movie" /><br />
-        <input type="submit" onClick="getRecommendation()" value="Get match!" />
+    	<header>
+    		<h1>Vult</h1>
+    	</header>
+        <main>
+        	<p>Pick a movie!</p>
+        	<input type="text" id="movie" /><br />
+        	<input type="submit" onClick="getRecommendation()" value="Get match!" />
+        	<div id="result"></div>
+        </main>
     </body>
 </html>

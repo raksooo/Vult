@@ -2,7 +2,7 @@ var fs = require('fs');
 var db = require('./databaseHandler');
 
 var DATE = '1970-01-01';
-var BITS_PER_POSITION = 2; //offsetintervals
+var BITS_PER_POSITION = 6; //offsetintervals
 var BIT_LENGTH = 1000;
 
 db.openPool();
@@ -10,7 +10,7 @@ db.openPool();
 exports.getResult = function(film1, film2, callback) {
 	db.getResult(film1, film2, function(result, offset, shortFilm) {
 		if (result !== undefined) {
-			callback({overlap: result, offset: offset, shortFilm: shortFilm});
+			callback({overlap: result, offset: offset*BITS_PER_POSITION, shortFilm: shortFilm, film1: film1, film2: film2});
 		} else {
 			var sub1 = toBinary(parseSubtitle(film1), BIT_LENGTH);
 		    var sub2 = toBinary(parseSubtitle(film2), BIT_LENGTH);
@@ -67,7 +67,7 @@ function calculateOverlap(sub1, sub2, film1, film2) {
 
     db.insertResult(film1, film2, best, offset, shortFilm);
 
-    return {overlap: best, shorter: shortFilm, offset: offset};
+    return {overlap: best, shorter: shortFilm, offset: offset*BITS_PER_POSITION, film1: film1, film2: film2};
 }
 
 function calculateLines(lines) {

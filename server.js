@@ -4,7 +4,11 @@ var alg = require('./algorithm');
 var app = express();
 
 app.get('/', function (req, res) {
-  res.send('Hello World!');
+  res.sendfile(__dirname + '/index.html');
+});
+
+app.get('/styles.css', function (req, res) {
+  res.sendfile(__dirname + '/styles.css');
 });
 
 app.get('/getRecommendedMovies', function(req, res) {
