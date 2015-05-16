@@ -1,9 +1,16 @@
 var express = require('express');
 var mysql = require('mysql');
+var alg = require('./algorithm');
 var app = express();
 
 app.get('/', function (req, res) {
   res.send('Hello World!');
+});
+
+app.get('/getRecommendedMovies', function(req, res) {
+  alg.getResult(req.query.film1, req.query.film2, function(result) {
+    res.send(result);
+  });
 });
 
 var server = app.listen(9999, function () {
@@ -15,6 +22,6 @@ var server = app.listen(9999, function () {
 
 });
 
-var scripts = require('./scripts/app.js');
-scripts.init();
+//var scripts = require('./scripts/app.js');
+//scripts.init();
 
