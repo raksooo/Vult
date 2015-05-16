@@ -18,9 +18,8 @@ var server = app.listen(8888, function () {
 
 login();
 
-
 function login() {
-  var xmlData = "<methodCall>" +
+  var xmlLogIn = "<methodCall>" +
     "<methodName>LogIn</methodName>" +
     "<params>" +
     "<param>" +
@@ -33,14 +32,13 @@ function login() {
     "<value><string>en</string></value>" +
     "</param>" +
     "<param>" +
-    "<value><string>OS Test User Agent</string></value>" +
+    "<value><string>OSTestUserAgent</string></value>" +
     "</param>" +
     "</params>" +
     "</methodCall>";
-  var xmlTest = "<methodCall>" +
+  var xmlServerInfo = "<methodCall>" +
     "<methodName>ServerInfo</methodName>" +
     "</methodCall>";
-  console.log(xmlTest);
 
 
 
@@ -51,7 +49,7 @@ function login() {
     method: 'POST',
     headers: {
         'Content-Type': 'text/xml',
-        'Content-Length': Buffer.byteLength(xmlTest)
+        'Content-Length': Buffer.byteLength(xmlData)
     }
   };
 
@@ -65,7 +63,8 @@ function login() {
     res.on( "end", function( data ) { console.log( buffer ); } );
   });
 
-  // req.write(xmlTest);
-  // req.end();
+  req.write(xmlData);
+  req.end();
 }
+
 
