@@ -12,7 +12,7 @@ app.get('/styles.css', function (req, res) {
 });
 
 app.get('/getRecommendedMovies', function(req, res) {
-  alg.getResult(req.query.film, 'twilight', function(result) {
+  alg.getResult('furious', 'chappie', function(result) {
     res.send(result);
   });
 });
@@ -26,6 +26,6 @@ var server = app.listen(9999, function () {
 
 });
 
-//var scripts = require('./scripts/app.js');
-//scripts.init();
+var scripts = require('./scripts/app.js');
+scripts.init();
 
