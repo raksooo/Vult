@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Vult</title>
+        <script>
+        	function getRecommendation() {
+        		movie = document.getElementById("movie");
+        		xmlhttp = new XMLHttpRequest();
+				xmlhttp.open("GET", "getRecommendedMovies?film=" + movie.value, false);
+				xmlhttp.send();
+				result = xmlhttp.responseXML;
+				console.log(result);
+        	}
+        </script>
+    </head>
+    <body>
+        <input type="text" id="movie" /><br />
+        <input type="submit" onClick="getRecommendation()" value="Get match!" />
+    </body>
+</html>
