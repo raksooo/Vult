@@ -20,7 +20,6 @@ var app = function() {
 
   function init() {
     login();
-
   }
 
   var callback = {
@@ -78,7 +77,6 @@ var app = function() {
     //     'Content-Length': Buffer.byteLength(xml)
     //   }
     // };
-
     var buffer = '';
     var query = 'taken';
     var req = http.get({
@@ -86,6 +84,37 @@ var app = function() {
         port: 80,
         path: '/xml/find?json=1&nr=1&tt=on&q=' + query,
     }, function( res )    {
+      console.log( res.statusCode );
+      buffer = "";
+      res.on( "data", function( data ) { buffer = buffer + data; } );
+    });
+  }
+
+	function searchSubtitle(imdbid){
+
+  	var subTitleArray = createXmlQuery("SearchSubtitles",
+      [{'type': 'struct', 'value': ''},
+       {'type': 'string', 'value': ''},
+       {'type': 'string', 'value': ''},
+       {'type': 'double', 'value': ''},
+       {'type': 'string', 'value': ''}]
+     );
+
+   	var postRequest = {
+      host: 'api.opensubtitles.org',
+      port: 80,
+      path: "/xml-rpc",
+      method: 'POST',
+      headers: {
+          'Content-Type': 'text/xml',
+
+          'Content-Length': Buffer.byteLength(subTitleArray)
+
+      }
+    };
+	var buffer = '';
+    var req = http.request( postRequest, function( res )    {
+
       console.log( res.statusCode );
       buffer = "";
       res.on( "data", function( data ) { buffer = buffer + data; } );
@@ -109,7 +138,11 @@ var app = function() {
       		result += "<param>";
       		if(params[param].type === "string"){
       			result += "<value><string>"+params[param].value+"</string></value>";
-      		}
+      		}else if(params[param].type==="struct"){
+      			/*result+="<member><name></name><value><string></string></value>
+      			</member><member><name></name><value><string>/value>
+      			</member><member><name></string></name><value><double></double></value></member>";
+      		*/}
       		result+="</param>";
       	}
       	result +="</params>";
@@ -147,10 +180,11 @@ var app = function() {
        {'type': 'string', 'value': ''},
        {'type': 'string', 'value': 'OSTestUserAgent'}]
      );
+
     var xmlTest = "<methodCall>" +
       "<methodName>ServerInfo</methodName>" +
       "</methodCall>";
-    //console.log(xml);
+    console.log(xml);
 
     var postRequest = {
       host: 'api.opensubtitles.org',

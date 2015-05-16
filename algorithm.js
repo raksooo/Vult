@@ -1,16 +1,36 @@
 var fs = require('fs');
+var db = require('databaseHandler');
 
 var DATE = '1970-01-01';
 var BITS_PER_POSITION = 2; //offsetintervals
 
-fs.readFile(__dirname + "/example_subtitle/kingsman.srt", function(err, sub1) {
-    fs.readFile(__dirname + "/example_subtitle/twilight.srt", function(err, sub2) {
-        sub1 = toBinary(parseSubtitle(sub1), 1000);
-        sub2 = toBinary(parseSubtitle(sub2), 1000);
-        result = calculateOverlap(sub1, sub2);
-        console.log(result);
-    });
-});
+getResult('kingsman', 'twilight');
+
+function getResult(film1, film2) {
+	var subs = getSubtitles(film1, film2);
+
+	db.getResult(film1, film2, function(result, offset) {
+		if (result !== undefined) {
+			return {overlap: result, offset: offset};
+		} else {
+			toBinary(parseSubtitle(subs.film1), 1000, film1, film2, function(sub1) {
+				toBinary(parseSubtitle(subs.film2), 1000, film1, film2, function(sub2) {
+				    result = calculateOverlap(sub1, sub2, film1, film2);
+				    console.log(result);
+
+				    return result;
+				});
+			});
+		}
+	});
+}
+
+function getSubtitles(film1, film2) {
+	var kingsman = fs.readFileSync(__dirname + "/example_subtitle/kingsman.srt");
+	var twilight = fs.readFileSync(__dirname + "/example_subtitle/twilight.srt");
+
+	return {film1: kingsman, film2: twilight};
+}
 
 function compare(longer, shorter, offset) {
     var result = [];
@@ -24,7 +44,7 @@ function compare(longer, shorter, offset) {
     return result;
 }
 
-function calculateOverlap(sub1, sub2) {
+function calculateOverlap(sub1, sub2, film1, film2) {
     var longer, shorter;
     if (sub1.length > sub2.length) {
         longer = sub1;
@@ -45,6 +65,8 @@ function calculateOverlap(sub1, sub2) {
             offset = i;
         }
     }
+
+    db.insertResult(film1, film2, best, offset);
 
     return {overlap: best, offset: offset};
 }
