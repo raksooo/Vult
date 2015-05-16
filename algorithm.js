@@ -3,8 +3,12 @@ var fs = require('fs');
 var DATE = '1970-01-01';
 
 fs.readFile(__dirname + "/example_subtitle/exMachina_short.srt", function(err, sub) {
-    console.log(toBinary(parseSubtitle(sub), 1000));
+    console.log(toBinary(parseSubtitle(sub), 1));
 });
+
+function compare() {
+
+}
 
 function parseSubtitle(subtitle) {
 	var lines = subtitle.toString().split('\n');
@@ -42,7 +46,7 @@ function parseInterval(interval) {
 
 function parseTime(time) {
     time = time.replace(',', ':');
-	var parsed = Date.parse(DATE + " " + time) + 60*60*1000;
+	var parsed = (Date.parse(DATE + " " + time) + 60*60*1000)/1000;
     return parsed;
 }
 
@@ -53,26 +57,26 @@ function toBinary(intervals, bitLength) {
 
 	intervals.forEach(function(interval) {
 		var noSub = Math.floor(interval.start / bitLength) - Math.ceil(previousEnd / bitLength);
+        noSub = noSub < 0 ? 0 : noSub;
 		var sub = Math.ceil(interval.end / bitLength) - Math.floor(interval.start / bitLength);
 		previousEnd = interval.end;
 
-		binary = binary << noSub;
-		for (var i = 0; i < sub; i++) {
-			binary = (binary << 1) + 1;
-		}
+		binary = binary.concat(addToBinary(binary.pop(), noSub, false));
+		binary = binary.concat(addToBinary(binary.pop(), sub, true));
 	});
 
 	return binary;
 }
 
 function addToBinary(binary, length, value) {
-	var binaryLength = Math.log2(binary + 1);
+	var binaryLength = Math.ceil(Math.log2(binary + 1));
 
-	if (length + binaryLength <= 32) {
-		binary = bitShift(binary, length, value);
+	if (length + binaryLength <= 30) {
+		return [bitShift(binary, length, value)];
 	} else {
-		var spaceLeft = 32 - binaryLength;
-		binary = bitShift(binary, spaceLeft, value);
+		var spaceLeft = 30 - binaryLength;
+		var newBinaries = [bitShift(binary, spaceLeft, value)];
+        return newBinaries.concat(addToBinary(1, length-spaceLeft, value));
 	}
 }
 
@@ -87,8 +91,4 @@ function bitShift(binary, length, value) {
 
 	return binary;
 }
-
-
-
-
 
