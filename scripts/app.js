@@ -1,11 +1,14 @@
-exports = {
-  init: app
+module.exports = {
+  init: function (){ app(); return "hej"; } //app()
 };
+
+var http = require('http');
+var xml2js = require('xml2js');
 
 var app = function() {
   var data = {
     searchMovie: searchMovie,
-    init: init()
+    init: init
   };
   init();
 
@@ -22,12 +25,13 @@ var app = function() {
   function createXmlQuery(name, params){
   	var result = "<methodCall>" +
       "<methodName>"+ name+ "</methodName>";
-      if (params>0) {
+      if (params.length>0) {
       	result += "<params>";
       	for (var param in params){
       		result += "<param>";
-      		if(param.type==="string"){
-      			result += "<value><string>"+param.value+"</string></value>";
+          console.log(param);
+      		if(params[param].type === "string"){
+      			result += "<value><string>"+params[param].value+"</string></value>";
       		}
       		result+="</param>";
       	}
@@ -38,10 +42,10 @@ var app = function() {
   }
   //Söka filmer, leta subtitles till filmer, ladda ner subtitles
   var parseString = require('xml2js').parseString;
-  var xml = '<?xml version="1.0" encoding="UTF-8" ?>';
-  parseString(xml, function (err, result) {
-      console.dir(JSON.stringify(result));
-  });
+  // var xml = '<?xml version="1.0" encoding="UTF-8" ?>';
+  // parseString(xml, function (err, result) {
+  //     console.dir(JSON.stringify(result));
+  // });
   function login() {
     var xmlData = "<methodCall>" +
       "<methodName>LogIn</methodName>" +
@@ -65,13 +69,13 @@ var app = function() {
       [{'type': 'string', 'value': ''},
        {'type': 'string', 'value': ''},
        {'type': 'string', 'value': ''},
-       {'type': 'string', 'value': ''},
        {'type': 'string', 'value': 'OSTestUserAgent'}]
      );
+    console.log(xml);
     var xmlTest = "<methodCall>" +
       "<methodName>ServerInfo</methodName>" +
       "</methodCall>";
-    console.log(xml);
+    //console.log(xml);
 
     var postRequest = {
       host: 'api.opensubtitles.org',
@@ -80,14 +84,13 @@ var app = function() {
       method: 'POST',
       headers: {
           'Content-Type': 'text/xml',
-          'Content-Length': Buffer.byteLength(xmlTest)
+          'Content-Length': Buffer.byteLength(xml)
       }
     };
 
     var buffer = '';
     var req = http.request( postRequest, function( res )    {
 
-      console.log(res);
       console.log( res.statusCode );
       buffer = "";
       res.on( "data", function( data ) { buffer = buffer + data; } );
@@ -98,4 +101,4 @@ var app = function() {
     req.end();
 
   }
-}
+};
