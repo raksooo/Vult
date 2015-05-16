@@ -8,14 +8,12 @@ var BIT_LENGTH = 1000;
 db.openPool();
 
 exports.getResult = function(film1, film2, callback) {
-	var subs = getSubtitles(film1, film2);
-
 	db.getResult(film1, film2, function(result, offset, shortFilm) {
 		if (result !== undefined) {
 			callback({overlap: result, offset: offset, shortFilm: shortFilm});
 		} else {
-			var sub1 = toBinary(parseSubtitle(subs.film1), BIT_LENGTH);
-		    var sub2 = toBinary(parseSubtitle(subs.film2), BIT_LENGTH);
+			var sub1 = toBinary(parseSubtitle(film1), BIT_LENGTH);
+		    var sub2 = toBinary(parseSubtitle(film2), BIT_LENGTH);
             result = calculateOverlap(sub1, sub2, film1, film2);
 
             callback(result);
@@ -23,11 +21,11 @@ exports.getResult = function(film1, film2, callback) {
 	});
 }
 
-function getSubtitles(film1, film2) {
-	var kingsman = fs.readFileSync(__dirname + "/example_subtitle/kingsman.srt");
-	var twilight = fs.readFileSync(__dirname + "/example_subtitle/twilight.srt");
-
-	return {film1: twilight, film2: kingsman};
+function getSubtitles(film1) {
+    if (film1 == "furious")
+        return fs.readFileSync(__dirname + "/example_subtitle/furious.srt");
+	else
+        return fs.readFileSync(__dirname + "/example_subtitle/chappie.srt");
 }
 
 function compare(longer, shorter, offset) {
@@ -90,7 +88,9 @@ function calculateLines(lines) {
     return line;
 }
 
-function parseSubtitle(subtitle) {
+function parseSubtitle(film) {
+	var subtitle = getSubtitles(film);
+
 	var lines = subtitle.toString().split('\n');
 	var intervals = [];
 	var lastEmpty = true;
