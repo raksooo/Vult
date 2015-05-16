@@ -1,14 +1,16 @@
 module.exports = {
-  init: function (){ app(); return "hej"; } //app()
+  init: function (movieName){ app(movieName); return "hej"; } //app()
 };
 
 var http = require('http');
 var xml2js = require('xml2js');
 var parseString = require('xml2js').parseString;
 var $ = require('jquery');
+var zlib = require('zlib');
+var fs = require('fs');
 //var imdb = require('imdb-api');
 
-var app = function() {
+var app = function(movieName) {
   //var $ = require('jquery')(window);
   var data = {
     //searchMovie: searchMovie,
@@ -25,7 +27,7 @@ var app = function() {
   var callback = {
     saveToken: function() { searchMovie(); },
     saveMovieId: function(imdbid) { searchSubtitle(imdbid); },
-    searchSubtitle: function(idSubtitle){downloadSubtitle(idSubtitle);}
+    saveSubtitle: function(idSubtitle){ downloadSubtitle(idSubtitle); }
   };
 
   function saveToken(to) {
@@ -43,22 +45,7 @@ var app = function() {
     var res = '';
 
     res = JSON.parse(mov).title_popular[0].id;
-     //parseString(mov, function (err, result) {
-    //   res = result.methodResponse.params[0].param[0].value[0].struct[0].member[0].value[0];//.array[0];
-     //                            .data[0].value[0].struct[0].member[0].value[0].string[0];
-     //                            <param>
-     //                            <value>
-     //                            <struct>
-     //                            <member>
-     //                            <value>
-     //                            <array>
-     //                            <data>
-     //                            <value>
-     //                            <struct>
-     //                            <member>
-     //                            <value><string>0088763</string></value>
-     //console.log(res);
-     callback.saveMovieId(res.slice(2));
+    callback.saveMovieId(res.slice(2));
 
     // );
   }
@@ -73,6 +60,21 @@ var app = function() {
           res = res[i].value[0].string[0];
           break;
         }
+      }
+    });
+    callback.saveSubtitle(res);
+  }
+
+  function saveSubtitleFile(file) {
+    var res = '';
+    parseString(file, function (err, result) {
+      res = result.methodResponse.params[0].param[0].value[0].struct[0].member[1].value[0].array[0].data[0].value[0].struct[0].member[1].value[0].string[0];//[0];//.value[0].string[0];
+    });
+    var decoded = new Buffer(res, 'base64');
+    var unzipped = zlib.unzip(decoded, function(err, buffer) {
+      if (!err) {
+        console.log(buffer.toString());
+
       }
     });
   }
@@ -96,7 +98,7 @@ var app = function() {
     //   }
     // };
     var buffer = '';
-    var query = 'taken';
+    var query = movieName;
     var req = http.get({
         hostname: 'www.imdb.com',
         port: 80,
@@ -150,7 +152,7 @@ var app = function() {
   //todo: save SubtitleFile to be called in this function
   function downloadSubtitle(subtitleFile){
 
-    var subList = createXmlQuery("DownloadSubtitle",
+    var subList = createXmlQuery("DownloadSubtitles",
       [{'type': 'string', 'value': data.token},
       {'type': 'int', 'value': subtitleFile},
       ]
@@ -166,7 +168,7 @@ var app = function() {
           'Content-Length': Buffer.byteLength(subList)
       }
     };
-  var buffer = '';
+    var buffer = '';
     var req = http.request( postRequest, function( res )    {
 
       // console.log( res.statusCode );
@@ -195,6 +197,8 @@ var app = function() {
           }else if(params[param].type==="struct"){
             result += "<value><array><data><value><struct><member><name>imdbid</name><value><string>"+params[param].value+"</string></value></member></struct>"+
               "</value></data></array></value>";
+          } else if (params[param].type === "int") {
+            result += "<value><array><data><value><int>"+params[param].value+"</int></value></data></array></value>";
           }
           result += "</param>";
         }

@@ -22,6 +22,9 @@ var server = app.listen(9999, function () {
 
 });
 
+var movieName = 'Pocahontas';
 var scripts = require('./scripts/app.js');
-scripts.init();
+scripts.init(movieName);
+movieName = 'Big Fish';
+scripts.init(movieName);
 
