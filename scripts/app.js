@@ -6,6 +6,7 @@ var http = require('http');
 var xml2js = require('xml2js');
 var parseString = require('xml2js').parseString;
 var $ = require('jquery');
+//var imdb = require('imdb-api');
 
 var app = function() {
   //var $ = require('jquery')(window);
@@ -23,7 +24,8 @@ var app = function() {
   }
 
   var callback = {
-    saveToken: function() { searchMovie() }
+    saveToken: function() { searchMovie(); },
+    saveMovieId: function(imdbid) { searchSubtitle(imdbid); }
   };
 
   function saveToken(to) {
@@ -38,52 +40,64 @@ var app = function() {
 
   function saveMovieId(mov) {
     var res = '';
-    parseString(mov, function (err, result) {
-      res = result.methodResponse.params[0].param[0].value[0].struct[0].member[1].value[0].string[0];
-     // <value>
-     //  <array>
-     //   <data>
-     //    <value>
-     //     <struct>
-     //      <member>
-     //       <name>id</name>
-     //       <value><string>0088763</string></value>
-      console.log(res);
-    });
+    res = JSON.parse(mov).title_popular[0].id;
+    // parseString(mov, function (err, result) {
+    //   res = result.methodResponse.params[0].param[0].value[0].struct[0].member[0].value[0];//.array[0];
+     //                            .data[0].value[0].struct[0].member[0].value[0].string[0];
+     //                            <param>
+     //                            <value>
+     //                            <struct>
+     //                            <member>
+     //                            <value>
+     //                            <array>
+     //                            <data>
+     //                            <value>
+     //                            <struct>
+     //                            <member>
+     //                            <value><string>0088763</string></value>
+     console.log(res);
+     callback.saveMovieId(res);
+    // );
   }
 
 	function searchMovie(){
     // struct SearchMoviesOnIMDB(string $token, string $query)
-    var xml = createXmlQuery('SearchMoviesOnImdb', [
-        {'type' : 'string', 'value' : data.token},
-        {'type' : 'string', 'value' : 'Batman Begins'}
-    ]);
+    // var xml = createXmlQuery('SearchMoviesOnImdb', [
+    //     {'type' : 'string', 'value' : data.token},
+    //     {'type' : 'string', 'value' : 'taken'}
+    // ]);
 
-    var postRequest = {
-      host: 'api.opensubtitles.org',
-      port: 80,
-      path: "/xml-rpc",
-      method: 'POST',
-      headers: {
-          'Content-Type': 'text/xml',
-          'Content-Length': Buffer.byteLength(xml)
-      }
-    };
+
+    // var getRequest = {
+    //   host: 'www.imdb.com',
+    //   port: 80,
+    //   path: "/xml/find?json=1&nr=1&tt=on&q=lost",
+    //   method: 'GET',
+    //   headers: {
+    //     'Content-Type': 'text/xml',
+    //     'Content-Length': Buffer.byteLength(xml)
+    //   }
+    // };
 
     var buffer = '';
-    var req = http.request( postRequest, function( res )    {
-
+    var query = 'taken';
+    var req = http.get({
+        hostname: 'www.imdb.com',
+        port: 80,
+        path: '/xml/find?json=1&nr=1&tt=on&q=' + query,
+    }, function( res )    {
       console.log( res.statusCode );
       buffer = "";
       res.on( "data", function( data ) { buffer = buffer + data; } );
       res.on( "end", function( data ) { saveMovieId(buffer);  /*console.log( buffer );*/ } );
+    }).on('error', function ( res ) {
+    console.log(res);
+      console.log('Major error!');
     });
 
-    req.write(xml);
-    req.end();
-
-
-
+    //req.write(xml);
+    //req.get();
+    //req.end();
   }
 
   function createXmlQuery(name, params){
