@@ -7,7 +7,7 @@ var BIT_LENGTH = 1000;
 
 db.openPool();
 
-function getResult(film1, film2, callback) {
+exports.getResult = function(film1, film2, callback) {
 	var subs = getSubtitles(film1, film2);
 
 	db.getResult(film1, film2, function(result, offset, shortFilm) {
