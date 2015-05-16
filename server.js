@@ -19,7 +19,10 @@ app.get('/getRecommendedMovies', function(req, res) {
   alg.getResult('furious', 'chappie', function(result) {
     res.send(result);
   });
-  scripts.init(movieName);
+  for (var i = 0; i < movies.movies.length ; i++) {
+    movieName = movies.movies[i];
+    scripts.init(movieName);
+  }
 });
 
 var server = app.listen(9999, function () {
