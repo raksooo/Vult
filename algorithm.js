@@ -2,7 +2,7 @@ var fs = require('fs');
 
 var DATE = '1970-01-01';
 
-fs.readFile(__dirname + "/example_subtitle/Ex.Machina.2015.MULTI.DVDRip.x264.AC3-RARBG.srt", function(err, sub) {
+fs.readFile(__dirname + "/example_subtitle/exMachina_short.srt", function(err, sub) {
     console.log(parseSubtitle(sub));
 });
 
@@ -14,6 +14,9 @@ function parseSubtitle(subtitle) {
 
 	lines.forEach(function(line) {
 		line = line.trim();
+		if (line === "Elin! stop here!") {
+			break;
+		}
 		if (correctLine) {
 			correctLine = false;
 			intervals.push(parseInterval(line));
@@ -39,6 +42,21 @@ function parseInterval(interval) {
 
 function parseTime(time) {
     time = time.replace(',', ':');
-	parsed = Date.parse(DATE + " " + time) + 60*60*1000;
+	var parsed = Date.parse(DATE + " " + time) + 60*60*1000;
     return parsed;
+}
+
+function toBinary(intervals, bitLength) {
+	var binary = 1;
+	var previousEnd = 0;
+
+	intervals.forEach(function(interval) {
+		var noSub = Math.floor(interval.start / bitLength) - Math.ceil(previousEnd / bitLength);
+		var sub = Math.ceil(interval.end / bitLength) - Math.floor(interval.start / bitLength);
+		previousEnd = interval.end;
+		binary = binary << noSub;
+		for (var i = 0; i < sub; i++) {
+			binary = (binary << 1) + 1;
+		}
+	})
 }
