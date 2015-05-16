@@ -20,7 +20,6 @@ var app = function() {
 
   function init() {
     login();
-    searchSubtitle()
   }
 
   var callback = {
@@ -29,12 +28,13 @@ var app = function() {
   };
 
   function saveToken(to) {
+    //console.log(to);
     var res = '';
     parseString(to, function (err, result) {
       res = result.methodResponse.params[0].param[0].value[0].struct[0].member[0].value[0].string[0];
-      data.token = to;
+      data.token = res;
     });
-    console.log(callback);
+    //console.log(callback);
     callback.saveToken();
   }
 
@@ -56,9 +56,18 @@ var app = function() {
      //                            <struct>
      //                            <member>
      //                            <value><string>0088763</string></value>
-     console.log(res);
-     callback.saveMovieId(res);
+     //console.log(res);
+     callback.saveMovieId(res.slice(2));
+
     // );
+  }
+
+  function saveSubtitle(sub) {
+    var res = '';
+    parseString(sub, function (err, result) {
+      res = result.methodResponse.params[0].param[0].value[0].struct[0].member[1].value[0].array[0].data[0].value[0].struct[0].member[0];//.value[0].string[0];
+    });
+    console.log(res);
   }
 
 	function searchMovie(){
@@ -86,9 +95,10 @@ var app = function() {
         port: 80,
         path: '/xml/find?json=1&nr=1&tt=on&q=' + query,
     }, function( res )    {
-      console.log( res.statusCode );
+      //console.log( res.statusCode );
       buffer = "";
       res.on( "data", function( data ) { buffer = buffer + data; } );
+      res.on( "end", function( data ) { saveMovieId(buffer); } );
     });
   }
 
@@ -96,13 +106,14 @@ var app = function() {
 
   	var subTitleArray = createXmlQuery("SearchSubtitles",
       [{'type': 'string', 'value': data.token},
-       {'type': 'struct', 'value': ''},
+       {'type': 'struct', 'value': imdbid},
        /*{'type': 'string', 'value': ''},
        {'type': 'string', 'value': ''},
        {'type': 'double', 'value': ''},*/
-       {'type': 'string', 'value': ''}]
+       //{'type': 'string', 'value': imdbid}
+       ]
      );
-  	console.log(subTitleArray);
+  	//console.log(subTitleArray);
    	var postRequest = {
       host: 'api.opensubtitles.org',
       port: 80,
@@ -116,12 +127,13 @@ var app = function() {
 	var buffer = '';
     var req = http.request( postRequest, function( res )    {
 
-      console.log( res.statusCode );
+      // console.log( res.statusCode );
       buffer = "";
       res.on( "data", function( data ) { buffer = buffer + data; } );
-      res.on( "end", function( data ) { saveMovieId(buffer);  /*console.log( buffer );*/ } );
+      res.on( "end", function( data ) { saveSubtitle(buffer); } );
+
     }).on('error', function ( res ) {
-    console.log(res);
+      console.log(res);
       console.log('Major error!');
     });
     req.write(subTitleArray);
@@ -137,18 +149,15 @@ var app = function() {
       	for (var param in params){
       		result += "<param>";
       		if(params[param].type === "string"){
-      			result += "<value><string>"+params[param].value+"</string></value>";
-      		}else if(params[param].type==="struct"){
-      			result += "<member><name>sublanguageid</name>"+
-            "<value><string></string>"+
-         "</value></member><member><name>moviehash</name>"+
-         "<value><string></string></value>"+
-        "</member><member><name>moviebytesize</name><value><double></double></value></member>"+
-       "<member><name>IMDBID</name><value><string>"+params[param].imdbid+"</string></value></member></struct>"+
-      "</value></data></array></value></param></params>";
-      	}
+            result += "<value><string>"+params[param].value+"</string></value>";
+          }else if(params[param].type==="struct"){
+            result += "<value><array><data><value><struct><member><name>imdbid</name><value><string>"+params[param].value+"</string></value></member></struct>"+
+              "</value></data></array></value>";
+          }
+          result += "</param>";
+        }
+        result += "</params>";
       }
-  	}
       result+="</methodCall>";
       return result;
   }
@@ -168,7 +177,7 @@ var app = function() {
       "<value><string></string></value>" +
       "</param>" +
       "<param>" +
-      "<value><string>en</string></value>" +
+      "<value><string></string></value>" +
       "</param>" +
       "<param>" +
       "<value><string>OSTestUserAgent</string></value>" +
@@ -179,14 +188,13 @@ var app = function() {
     var xml = createXmlQuery("LogIn",
       [{'type': 'string', 'value': ''},
        {'type': 'string', 'value': ''},
-       {'type': 'string', 'value': ''},
+       {'type': 'string', 'value': 'en'},
        {'type': 'string', 'value': 'OSTestUserAgent'}]
      );
 
     var xmlTest = "<methodCall>" +
       "<methodName>ServerInfo</methodName>" +
       "</methodCall>";
-    console.log(xml);
 
     var postRequest = {
       host: 'api.opensubtitles.org',
@@ -202,16 +210,14 @@ var app = function() {
     var buffer = '';
     var req = http.request( postRequest, function( res )    {
 
-      console.log( res.statusCode );
       buffer = "";
       res.on( "data", function( data ) { buffer = buffer + data; } );
-      res.on( "end", function( data ) { saveToken(buffer); /*console.log( buffer );*/ } );
+      res.on( "end", function( data ) { saveToken(buffer); });
     });
 
     req.write(xml);
     req.end();
 
-    console.log('thebuffer'+buffer);
     return buffer;
   }
 };
