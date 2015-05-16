@@ -19,6 +19,7 @@ var app = function() {
 
   function init() {
     login();
+    searchSubtitle()
   }
 
   var callback = {
@@ -38,7 +39,7 @@ var app = function() {
   function saveMovieId(mov) {
     var res = '';
     parseString(mov, function (err, result) {
-      res = result.methodResponse.params[0].param[0].value[0].struct[0].member[1].value[0].string[0];
+     // res = result.methodResponse.params[0].param[0].value[0].struct[0].member[1].value[0].string[0];
      // <value>
      //  <array>
      //   <data>
@@ -82,13 +83,14 @@ var app = function() {
 	function searchSubtitle(){
   
   	var subTitleArray = createXmlQuery("SearchSubtitles",
-      [{'type': 'struct', 'value': ''},
+      [{'type': 'string', 'value': data.token},
+       {'type': 'struct', 'value': ''},
+       /*{'type': 'string', 'value': ''},
        {'type': 'string', 'value': ''},
-       {'type': 'string', 'value': ''},
-       {'type': 'double', 'value': ''},
+       {'type': 'double', 'value': ''},*/
        {'type': 'string', 'value': ''}]
      );
-
+  	console.log(subTitleArray);
    	var postRequest = {
       host: 'api.opensubtitles.org',
       port: 80,
@@ -96,9 +98,7 @@ var app = function() {
       method: 'POST',
       headers: {
           'Content-Type': 'text/xml',
-
           'Content-Length': Buffer.byteLength(subTitleArray)
-
       }
     };
 	var buffer = '';
@@ -110,7 +110,7 @@ var app = function() {
       res.on( "end", function( data ) { saveMovieId(buffer);  /*console.log( buffer );*/ } );
     });
 
-    req.write(xml);
+    req.write(subTitleArray);
     req.end();
   }
 
@@ -124,14 +124,16 @@ var app = function() {
       		if(params[param].type === "string"){
       			result += "<value><string>"+params[param].value+"</string></value>";
       		}else if(params[param].type==="struct"){
-      			/*result+="<member><name></name><value><string></string></value>
-      			</member><member><name></name><value><string>/value>
-      			</member><member><name></string></name><value><double></double></value></member>";
-      		*/}
-      		result+="</param>";
+      			result += "<member><name>sublanguageid</name>"+
+            "<value><string></string>"+
+         "</value></member><member><name>moviehash</name>"+
+         "<value><string></string></value>"+
+        "</member><member><name>moviebytesize</name><value><double></double></value></member>"+
+       "<member><name>IMDBID</name><value><string>"+params[param].imdbid+"</string></value></member></struct>"+
+      "</value></data></array></value></param></params>";
       	}
-      	result +="</params>";
       }
+  	}
       result+="</methodCall>";
       return result;
   }
