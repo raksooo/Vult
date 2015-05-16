@@ -70,6 +70,7 @@ try {
   }
 
   function saveSubtitleFile(file) {
+  try {
     var res = '';
     parseString(file, function (err, result) {
       res = result.methodResponse.params[0].param[0].value[0].struct[0].member[1].value[0].array[0].data[0].value[0].struct[0].member[1].value[0].string[0];//[0];//.value[0].string[0];
@@ -80,6 +81,8 @@ try {
         callback.init(unzipped);
       }
     });
+  } catch (err) {
+  }
   }
 
 	function searchMovie(){
