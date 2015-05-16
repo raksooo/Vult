@@ -14,27 +14,26 @@ exports.getSubtitles = function(film, callback) {
 
 exports.parseSubtitle = function(film, callback) {
     exports.getSubtitles(film, function(subtitle) {
+        var lines = subtitle.toString().split('\n');
+        var intervals = [];
+        var lastEmpty = true;
+        var correctLine = false;
 
-    var lines = subtitle.toString().split('\n');
-    var intervals = [];
-    var lastEmpty = true;
-    var correctLine = false;
+        lines.forEach(function(line) {
+            line = line.trim();
+            if (correctLine) {
+                correctLine = false;
+                intervals.push(exports.parseInterval(line));
+            } else if (!line.length) {
+                lastEmpty = true;
+            } else if (lastEmpty && line%1 === 0) {
+                correctLine = true;
+                lastEmpty = false;
+            }
+        });
 
-    lines.some(function(line) {
-        line = line.trim();
-        if (correctLine) {
-            correctLine = false;
-            intervals.push(exports.parseInterval(line));
-        } else if (!line.length) {
-            lastEmpty = true;
-        } else if (lastEmpty && line%1 === 0) {
-            correctLine = true;
-            lastEmpty = false;
-        }
+        callback(intervals);
     });
-
-  callback(intervals);
-  });
 },
 
 exports.parseInterval = function(interval) {
