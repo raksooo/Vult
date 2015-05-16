@@ -12,20 +12,23 @@ exports.getResult = function(film1, film2, callback) {
 		if (result !== undefined) {
 			callback({overlap: result, offset: offset*BITS_PER_POSITION, shortFilm: shortFilm, film1: film1, film2: film2});
 		} else {
-			var sub1 = toBinary(parseSubtitle(film1), BIT_LENGTH);
-		    var sub2 = toBinary(parseSubtitle(film2), BIT_LENGTH);
+      parseSubtitle(film1, function(parsed1) {
+        parseSubtitle(film2, function(parsed2) {
+        var sub1 = toBinary(parsed1, BIT_LENGTH);
+		    var sub2 = toBinary(parsed2, BIT_LENGTH);
             result = calculateOverlap(sub1, sub2, film1, film2);
 
             callback(result);
+        });
+      });
 		}
 	});
 }
 
-function getSubtitles(film1) {
-    if (film1 == "furious")
-        return fs.readFileSync(__dirname + "/example_subtitle/furious.srt");
-	else
-        return fs.readFileSync(__dirname + "/example_subtitle/chappie.srt");
+var scripts = require('./scripts/app.js');
+
+function getSubtitles(film1, callback) {
+    scripts.init(movieName, callback);
 }
 
 function compare(longer, shorter, offset) {
@@ -88,8 +91,8 @@ function calculateLines(lines) {
     return line;
 }
 
-function parseSubtitle(film) {
-	var subtitle = getSubtitles(film);
+function parseSubtitle(film, callback) {
+  getSubtitles(film, function(subtitle) {
 
 	var lines = subtitle.toString().split('\n');
 	var intervals = [];
@@ -109,7 +112,8 @@ function parseSubtitle(film) {
         }
 	});
 
-	return intervals;
+  callback(intervals);
+  });
 }
 
 function parseInterval(interval) {

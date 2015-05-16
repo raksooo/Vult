@@ -16,12 +16,11 @@ app.get('/styles.css', function (req, res) {
 });
 
 app.get('/getRecommendedMovies', function(req, res) {
-  alg.getResult('furious', 'chappie', function(result) {
-    res.send(result);
-  });
   for (var i = 0; i < movies.movies.length ; i++) {
     movieName = movies.movies[i];
-    scripts.init(movieName);
+    alg.getResult(req.query.film, movieName, function(result) {
+      res.send(result);
+    });
   }
 });
 

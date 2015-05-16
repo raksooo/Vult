@@ -1,5 +1,5 @@
 module.exports = {
-  init: function (movieName){ app(movieName); return "hej"; } //app()
+  init: function (movieName, cB){ app(movieName); return "hej"; } //app()
 };
 
 var http = require('http');
@@ -10,7 +10,7 @@ var zlib = require('zlib');
 var fs = require('fs');
 //var imdb = require('imdb-api');
 
-var app = function(movieName) {
+var app = function(movieName, cB) {
   //var $ = require('jquery')(window);
   var data = {
     //searchMovie: searchMovie,
@@ -27,7 +27,8 @@ var app = function(movieName) {
   var callback = {
     saveToken: function() { searchMovie(); },
     saveMovieId: function(imdbid) { searchSubtitle(imdbid); },
-    saveSubtitle: function(idSubtitle){ downloadSubtitle(idSubtitle); }
+    saveSubtitle: function(idSubtitle){ downloadSubtitle(idSubtitle); },
+    init: function(data) { cB(data); }
   };
 
   function saveToken(to) {
@@ -73,8 +74,7 @@ var app = function(movieName) {
     var decoded = new Buffer(res, 'base64');
     var unzipped = zlib.unzip(decoded, function(err, buffer) {
       if (!err) {
-        console.log(buffer.toString());
-
+        callback.init(unzipped);
       }
     });
   }
