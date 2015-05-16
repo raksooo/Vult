@@ -22,6 +22,6 @@ var server = app.listen(9999, function () {
 
 });
 
-//var scripts = require('./scripts/app.js');
-//scripts.init();
+var scripts = require('./scripts/app.js');
+scripts.init();
 

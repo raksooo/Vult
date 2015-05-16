@@ -24,7 +24,8 @@ var app = function() {
 
   var callback = {
     saveToken: function() { searchMovie(); },
-    saveMovieId: function(imdbid) { searchSubtitle(imdbid); }
+    saveMovieId: function(imdbid) { searchSubtitle(imdbid); },
+    searchSubtitle: function(idSubtitle){downloadSubtitle(idSubtitle);}
   };
 
   function saveToken(to) {
@@ -42,7 +43,7 @@ var app = function() {
     var res = '';
 
     res = JSON.parse(mov).title_popular[0].id;
-    // parseString(mov, function (err, result) {
+     //parseString(mov, function (err, result) {
     //   res = result.methodResponse.params[0].param[0].value[0].struct[0].member[0].value[0];//.array[0];
      //                            .data[0].value[0].struct[0].member[0].value[0].string[0];
      //                            <param>
@@ -65,9 +66,15 @@ var app = function() {
   function saveSubtitle(sub) {
     var res = '';
     parseString(sub, function (err, result) {
-      res = result.methodResponse.params[0].param[0].value[0].struct[0].member[1].value[0].array[0].data[0].value[0].struct[0].member[0];//.value[0].string[0];
+      res = result.methodResponse.params[0].param[0].value[0].struct[0].member[1].value[0].array[0].data[0].value[0].struct[0].member;//[0];//.value[0].string[0];
+      var member;
+      for ( var i = 0 ; i<res.length ; i++ ) {
+        if (res[i].name[0] === 'IDSubtitle') {
+          res = res[i].value[0].string[0];
+          break;
+        }
+      }
     });
-    console.log(res);
   }
 
 	function searchMovie(){
@@ -139,6 +146,41 @@ var app = function() {
     req.write(subTitleArray);
     req.end();
 
+  }
+  //todo: save SubtitleFile to be called in this function
+  function downloadSubtitle(subtitleFile){
+
+    var subList = createXmlQuery("DownloadSubtitle",
+      [{'type': 'string', 'value': data.token},
+      {'type': 'int', 'value': subtitleFile},
+      ]
+      );
+      console.log(subList);
+      var postRequest = {
+      host: 'api.opensubtitles.org',
+      port: 80,
+      path: "/xml-rpc",
+      method: 'POST',
+      headers: {
+          'Content-Type': 'text/xml',
+          'Content-Length': Buffer.byteLength(subList)
+      }
+    };
+  var buffer = '';
+    var req = http.request( postRequest, function( res )    {
+
+      // console.log( res.statusCode );
+      buffer = "";
+      res.on( "data", function( data ) { buffer = buffer + data; } );
+      res.on( "end", function( data ) { saveSubtitleFile(buffer); } );
+
+    }).on('error', function ( res ) {
+      console.log(res);
+      console.log('Major error!');
+    });
+    req.write(subList);
+    req.end();
+    
   }
 
   function createXmlQuery(name, params){

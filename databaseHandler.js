@@ -10,14 +10,14 @@ var CREATE_SUBS = "CREATE TABLE Subs (Film varchar(255), Data MEDIUMTEXT);";
 var INSERT_SUBS = "INSERT INTO Subs VALUES (?,?);";
 var GET_SUBS = "SELECT Data FROM Subs WHERE Film = ?;";
 
-exports.openPool = function() {
-    connection = mysql.createConnection({
+exports.openPool = function() {/*
+  connection = mysql.createConnection({
         host: 'localhost',
         user: 'root',
         password: '',
         database: 'Vult'
     });
-    connection.connect();
+    connection.connect();*/
 }
 
 exports.closePool = function() {
