@@ -8,7 +8,7 @@ app.get('/', function (req, res) {
 });
 
 app.get('/getRecommendedMovies', function(req, res) {
-  alg.getResult(req.query.film, 'twilight', function(result) {
+  alg.getResult('furious', 'chappie', function(result) {
     res.send(result);
   });
 });

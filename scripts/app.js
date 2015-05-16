@@ -66,9 +66,15 @@ var app = function() {
   function saveSubtitle(sub) {
     var res = '';
     parseString(sub, function (err, result) {
-      res = result.methodResponse.params[0].param[0].value[0].struct[0].member[1].value[0].array[0].data[0].value[0].struct[0].member[0];//.value[0].string[0];
+      res = result.methodResponse.params[0].param[0].value[0].struct[0].member[1].value[0].array[0].data[0].value[0].struct[0].member;//[0];//.value[0].string[0];
+      var member;
+      for ( var i = 0 ; i<res.length ; i++ ) {
+        if (res[i].name[0] === 'IDSubtitle') {
+          res = res[i].value[0].string[0];
+          break;
+        }
+      }
     });
-    console.log(res);
   }
 
 	function searchMovie(){
