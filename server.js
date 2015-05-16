@@ -5,7 +5,11 @@ var movies = require('./movies');
 var app = express();
 
 app.get('/', function (req, res) {
-  res.send('Hello World!');
+  res.sendfile(__dirname + '/index.html');
+});
+
+app.get('/styles.css', function (req, res) {
+  res.sendfile(__dirname + '/styles.css');
 });
 
 app.get('/getRecommendedMovies', function(req, res) {
@@ -23,6 +27,9 @@ var server = app.listen(9999, function () {
 
 });
 
+var movieName = 'Pocahontas';
 var scripts = require('./scripts/app.js');
-scripts.init();
+scripts.init(movieName);
+movieName = 'Big Fish';
+scripts.init(movieName);
 
