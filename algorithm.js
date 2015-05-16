@@ -1,23 +1,28 @@
+var fs = require('fs');
+
 var DATE = '1970-01-01';
 
+fs.readFile(__dirname + "/example_subtitle/Ex.Machina.2015.MULTI.DVDRip.x264.AC3-RARBG.srt", function(err, sub) {
+    console.log(parseSubtitle(sub));
+});
+
 function parseSubtitle(subtitle) {
-	var lines = subtitle.split('\n');
+	var lines = subtitle.toString().split('\n');
 	var intervals = [];
-	var n = 1;
-	var lastEmpty = false;
+	var lastEmpty = true;
 	var correctLine = false;
 
-	lines.forEach((line) => {
-		line = trim(line);
+	lines.forEach(function(line) {
+		line = line.trim();
 		if (correctLine) {
 			correctLine = false;
 			intervals.push(parseInterval(line));
-		} else if (lastEmpty) {
-			correctLine = true;
-			lastEmpty = false;
 		} else if (!line.length) {
 			lastEmpty = true;
-		}	
+		} else if (lastEmpty && line%1 === 0) {
+			correctLine = true;
+			lastEmpty = false;
+        }
 	});
 
 	return intervals;
@@ -26,8 +31,14 @@ function parseSubtitle(subtitle) {
 function parseInterval(interval) {
 	var array = interval.split(' ');
 	interval = {};
-	interval.start = Date.parse(DATE + array[0]) + 60*60*1000;
-	interval.end = Date.parse(DATE + array[2]) + 60*60*1000;
-	
+	interval.start = parseTime(array[0]);
+	interval.end = parseTime(array[2]);
+
 	return interval;
+}
+
+function parseTime(time) {
+    time = time.replace(',', ':');
+	parsed = Date.parse(DATE + " " + time) + 60*60*1000;
+    return parsed;
 }
