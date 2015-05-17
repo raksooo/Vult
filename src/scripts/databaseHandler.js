@@ -10,7 +10,7 @@ var CREATE_SUBS = "CREATE TABLE Subtitles (Film varchar(255), Data TEXT);";
 var INSERT_SUBS = "INSERT INTO Subtitles VALUES (?,?);";
 var GET_SUBS = "SELECT Data FROM Subtitles WHERE Film = ?;";
 
-exports.open = function() {
+function open() {
   connection = mysql.createConnection({
         host: 'localhost',
         user: 'root',
@@ -20,34 +20,34 @@ exports.open = function() {
     connection.connect();
 }
 
-exports.close = function() {
+function close() {
     connection.end();
 }
 
-exports.insertResult = function(film1, film2, result, offset, shortFilm) {
+function insertResult(film1, film2, result, offset, shortFilm) {
     var films = film1 + ',' + film2;
     connection.query(INSERT_COMP, [films, result, offset, shortFilm]);
 };
 
-exports.insertSub = function(film, sub) {
+function insertSub(film, sub) {
     sub = JSON.stringify(sub);
     connection.query(INSERT_SUBS, [film, sub]);
 };
 
-exports.getResult = function(film1, film2, callback, second) {
+function getResult(film1, film2, callback, second) {
     var films = film1 + ',' + film2;
     connection.query(GET_COMP, [films], function(err, rows, fields) {
         if (rows.length > 0) {
             callback(rows[0].Result, rows[0].Offset, rows[0].Short);
         } else if (!second) {
-            exports.getResult(film2, film1, callback, true);
+            getResult(film2, film1, callback, true);
         } else {
             callback();
         }
     });
 };
 
-exports.getSub = function(film, callback) {
+function getSub(film, callback) {
     connection.query(GET_SUBS, [film], function(err, rows, fields) {
         if (rows.length > 0) {
             var binary = JSON.parse(rows[0].Data);
@@ -58,12 +58,12 @@ exports.getSub = function(film, callback) {
     });
 };
 
-exports.createTable = function(con) {
+function createTable(con) {
     con.query(CREATE_COMP);
     con.query(CREATE_SUBS);
 };
 
-exports.init = function() {
+function init() {
     var con = mysql.createConnection({
         host: 'localhost',
         user: 'root',
@@ -77,8 +77,19 @@ exports.init = function() {
                     exports.createTable(con);
                 }
                 con.end();
-                exports.open();
+                open();
             });
         });
     });
+};
+
+module.exports = {
+    open: open,
+    close: close,
+    insertResult: insertResult,
+    insertSub: insertSub,
+    getResult: getResult,
+    getSub: getSub,
+    createTable: createTable,
+    init: init
 };
