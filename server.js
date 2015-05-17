@@ -1,9 +1,9 @@
 var express = require('express');
 var mysql = require('mysql');
-var alg = require('./scripts/algorithm');
-var movies = require('./scripts/movies');
+var alg = require('./src/scripts/algorithm');
+var movies = require('./src/scripts/movies');
 var app = express();
-var scripts = require('./scripts/app.js');
+var scripts = require('./src/scripts/app.js');
 
 app.get('/', function (req, res) {
   res.sendfile(__dirname + '/src/static/index.html');
