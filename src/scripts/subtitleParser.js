@@ -67,8 +67,7 @@ function parseTime(time) {
 }
 
 function toBinary(intervals, bitLength) {
-    var current = 1;
-    var binary = [current];
+    var binary = [1];
     var previousEnd = 0;
 
     intervals.forEach(function(interval) {
