@@ -8,15 +8,9 @@ var express = require('express'),
     scripts = require('./src/scripts/app.js');
 
 var app = express();
-app.use("/static", express.static(__dirname + '/src/static'));
-var serve = serveStatic("./src/static/");
+app.use(express.static(__dirname + '/src/static'));
 
 db.init();
-
-app.get('/', function (req, res) {
-    var done = finalhandler(req, res);
-    serve(req, res, done);
-});
 
 app.get('/getRecommendedMovies', function(req, res) {
   var data = [];
