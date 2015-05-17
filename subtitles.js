@@ -13,37 +13,42 @@ function getSubtitle(film, callback) {
     //scripts.init(film, callback);
 }
 
-function parseSubtitle(film, callback) {
+function getSubtitleBinary(film, callback) {
     db.getSub(film, function(binary) {
         if (binary !== undefined) {
             callback(binary);
         } else {
             getSubtitle(film, function(subtitle) {
-                var lines = subtitle.toString().split('\n');
-                var intervals = [];
-                var lastEmpty = true;
-                var correctLine = false;
-
-                lines.forEach(function(line) {
-                    line = line.trim();
-                    if (correctLine) {
-                        correctLine = false;
-                        intervals.push(parseInterval(line));
-                    } else if (!line.length) {
-                        lastEmpty = true;
-                    } else if (lastEmpty && line%1 === 0) {
-                        correctLine = true;
-                        lastEmpty = false;
-                    }
-                });
-
-                var binary = toBinary(intervals, BIT_LENGTH);
+                var parsed = parseSubtitle(subtitle);
+                var binary = toBinary(parsed, BIT_LENGTH);
                 db.insertSub(film, binary);
 
                 callback(binary);
             });
         }
     });
+}
+
+function parseSubtitle(subtitle) {
+    var lines = subtitle.toString().split('\n');
+    var intervals = [];
+    var lastEmpty = true;
+    var correctLine = false;
+
+    lines.forEach(function(line) {
+        line = line.trim();
+        if (correctLine) {
+            correctLine = false;
+            intervals.push(parseInterval(line));
+        } else if (!line.length) {
+            lastEmpty = true;
+        } else if (lastEmpty && line%1 === 0) {
+            correctLine = true;
+            lastEmpty = false;
+        }
+    });
+
+    return intervals;
 }
 
 function parseInterval(interval) {
@@ -103,5 +108,5 @@ function bitShift(binary, length, value) {
     return binary;
 }
 
-exports.parseSubtitle = parseSubtitle;
+exports.getSubtitleBinary = getSubtitleBinary;
 

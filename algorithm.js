@@ -8,10 +8,9 @@ function getResult(film1, film2, callback) {
 		if (result !== undefined) {
 			callback({overlap: result, offset: offset*subs.BITS_PER_POSITION, shortFilm: shortFilm, film: film2});
 		} else {
-            subs.parseSubtitle(film1, function(sub1) {
-                subs.parseSubtitle(film2, function(sub2) {
+            subs.getSubtitleBinary(film1, function(sub1) {
+                subs.getSubtitleBinary(film2, function(sub2) {
                     result = calculateOverlap(sub1, sub2, film1, film2);
-
                     callback(result);
                 });
             });
