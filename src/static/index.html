@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Vult</title>
+        <script>
+        	function getRecommendation() {
+        		movie = document.getElementById("movie");
+        		xmlhttp = new XMLHttpRequest();
+				xmlhttp.open("GET", "getRecommendedMovies?film=" + movie.value, false);
+				xmlhttp.send();
+				var result = JSON.parse(xmlhttp.response);
+				console.log(result);
+
+				for (var i = 0; i < result.length; i++) {
+					var parsed = result[i];
+
+					var list = document.createElement("ul");
+					var offset = document.createElement("li");
+					var shortFilm = document.createElement("li");
+					var film = document.createElement("li");
+					var overlap = document.createElement("li");
+
+					offset.innerHTML = parsed.offset + 's';
+					shortFilm.innerHTML = parsed.shortFilm;
+					film.innerHTML = parsed.film;
+					overlap.innerHTML = Math.round(parsed.overlap*100) + '%';
+
+					list.appendChild(overlap);
+					list.appendChild(film);
+					list.appendChild(shortFilm);
+					list.appendChild(offset);
+
+					document.getElementById("result").appendChild(list);
+				};
+        	}
+        </script>
+        <!-- Styles -->
+    	<link rel="stylesheet" href="styles.css">
+    	<!-- Fonts -->
+        <link href='http://fonts.googleapis.com/css?family=Rajdhani:300|Josefin+Sans:100|Advent+Pro:100|Roboto:300' rel='stylesheet' type='text/css'>
+    </head>
+    <body>
+    	<header>
+    		<h1>Vult</h1>
+    	</header>
+        <main>
+        	<p>Pick a movie!</p>
+            <input type="text" id="movie" onkeydown="if (event.keyCode == 13) { getRecommendation(); }" /><br />
+        	<input type="submit" onClick="getRecommendation()" value="Get match!" />
+        	<div id="result"></div>
+        </main>
+    </body>
+</html>
