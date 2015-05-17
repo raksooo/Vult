@@ -17,19 +17,16 @@
 					var list = document.createElement("ul");
 					var offset = document.createElement("li");
 					var shortFilm = document.createElement("li");
-					var film1 = document.createElement("li");
-					var film2 = document.createElement("li");
+					var film = document.createElement("li");
 					var overlap = document.createElement("li");
 
 					offset.innerHTML = parsed.offset + 's';
 					shortFilm.innerHTML = parsed.shortFilm;
-					film1.innerHTML = parsed.film1;
-					film2.innerHTML = parsed.film2;
+					film.innerHTML = parsed.film;
 					overlap.innerHTML = Math.round(parsed.overlap*100) + '%';
 
 					list.appendChild(overlap);
-					list.appendChild(film1);
-					list.appendChild(film2);
+					list.appendChild(film);
 					list.appendChild(shortFilm);
 					list.appendChild(offset);
 

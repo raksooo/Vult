@@ -6,7 +6,7 @@ db.openPool();
 exports.getResult = function(film1, film2, callback) {
 	db.getResult(film1, film2, function(result, offset, shortFilm) {
 		if (result !== undefined) {
-			callback({overlap: result, offset: offset*subs.BITS_PER_POSITION, shortFilm: shortFilm, film1: film1, film2: film2});
+			callback({overlap: result, offset: offset*subs.BITS_PER_POSITION, shortFilm: shortFilm, film: film2});
 		} else {
             subs.parseSubtitle(film1, function(parsed1) {
                 subs.parseSubtitle(film2, function(parsed2) {
@@ -59,7 +59,7 @@ function calculateOverlap(sub1, sub2, film1, film2) {
     }
 
     db.insertResult(film1, film2, best, offset, shortFilm);
-    return {overlap: best, shorter: shortFilm, offset: offset*subs.BITS_PER_POSITION, film1: film1, film2: film2};
+    return {overlap: best, shorter: shortFilm, offset: offset*subs.BITS_PER_POSITION, film: film2};
 }
 
 function calculateLines(lines) {
