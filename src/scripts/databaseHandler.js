@@ -6,9 +6,9 @@ var INSERT_COMP = "INSERT INTO Comparison VALUES (?,?,?,?);";
 var GET_COMP = "SELECT Result,Offset,Short FROM Comparison WHERE Films = ?;";
 var CREATE_COMP = "CREATE TABLE Comparison (Films varchar(255), Result float, Offset int, PRIMARY KEY (Films), Short varchar(255));";
 
-var CREATE_SUBS = "CREATE TABLE Subs (Film varchar(255), Data TEXT);";
-var INSERT_SUBS = "INSERT INTO Subs VALUES (?,?);";
-var GET_SUBS = "SELECT Data FROM Subs WHERE Film = ?;";
+var CREATE_SUBS = "CREATE TABLE Subtitles (Film varchar(255), Data TEXT);";
+var INSERT_SUBS = "INSERT INTO Subtitles VALUES (?,?);";
+var GET_SUBS = "SELECT Data FROM Subtitles WHERE Film = ?;";
 
 exports.open = function() {
   connection = mysql.createConnection({
@@ -58,11 +58,27 @@ exports.getSub = function(film, callback) {
     });
 };
 
-exports.createTable = function() {
-    connection.query(CREATE_COMP);
-    connection.query(CREATE_SUBS);
+exports.createTable = function(con) {
+    con.query(CREATE_COMP);
+    con.query(CREATE_SUBS);
 };
 
-exports.tablesExists = function() {
-    
+exports.init = function() {
+    var con = mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        password: ''
+    });
+    con.connect();
+    con.query("CREATE DATABASE IF NOT EXISTS Vult;", function() {
+        con.query("USE Vult;", function() {
+            con.query("SHOW TABLES LIKE 'Comparison'", function(err, rows, fields) {
+                if (!rows.length) {
+                    exports.createTable(con);
+                }
+                con.end();
+                exports.open();
+            });
+        });
+    });
 };

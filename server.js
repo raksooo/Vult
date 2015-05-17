@@ -3,6 +3,7 @@ var express = require('express'),
     serveStatic = require('serve-static'),
     mysql = require('mysql'),
     alg = require('./src/scripts/algorithm'),
+    db = require('./src/scripts/databaseHandler'),
     movies = require('./src/scripts/movies'),
     scripts = require('./src/scripts/app.js');
 
@@ -11,6 +12,7 @@ app.use("/static", express.static(__dirname + '/src/static'));
 var serve = serveStatic("./src/static/");
 
 app.get('/', function (req, res) {
+    db.init();
     var done = finalhandler(req, res);
     serve(req, res, done);
 });

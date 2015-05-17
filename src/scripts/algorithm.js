@@ -1,8 +1,6 @@
 var db = require('./databaseHandler'),
     subs = require('./subtitleParser.js');
 
-db.open();
-
 function getResult(film1, film2, callback) {
 	db.getResult(film1, film2, function(result, offset, shortFilm) {
 		if (result !== undefined) {
@@ -56,7 +54,7 @@ function calculateOverlap(sub1, sub2, film1, film2) {
     }
 
     db.insertResult(film1, film2, best, offset, shortFilm);
-    return {overlap: best, shorter: shortFilm, offset: offset*subs.BITS_PER_POSITION, film: film2};
+    return {overlap: best, shortFilm: shortFilm, offset: offset*subs.BITS_PER_POSITION, film: film2};
 }
 
 function calculateLines(lines) {

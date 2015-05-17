@@ -7,7 +7,7 @@ var BITS_PER_POSITION = exports.BITS_PER_POSITION = 6; //offsetintervals
 var BIT_LENGTH = 1000;
 
 function getSubtitle(film, callback) {
-    fs.readFile(__dirname + '/../example_subtitle/chappie.srt', function(err, data) {
+    fs.readFile(__dirname + '/../../example_subtitle/chappie.srt', function(err, data) {
         callback(data);
     });
     //scripts.init(film, callback);
