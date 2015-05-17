@@ -3,17 +3,17 @@ var scripts = require('./scripts/app.js');
 
 var DATE = '1970-01-01';
 var BITS_PER_POSITION = exports.BITS_PER_POSITION = 6; //offsetintervals
-var BIT_LENGTH = exports.BIT_LENGTH = 1000;
+var BIT_LENGTH = 1000;
 
-exports.getSubtitles = function(film, callback) {
-    /*fs.readFile(__dirname + '/example_subtitle/chappie.srt', function(err, data) {
+function getSubtitle(film, callback) {
+    fs.readFile(__dirname + '/example_subtitle/chappie.srt', function(err, data) {
         callback(data);
-    });*/
-    scripts.init(film, callback);
-},
+    });
+    //scripts.init(film, callback);
+}
 
-exports.parseSubtitle = function(film, callback) {
-    exports.getSubtitles(film, function(subtitle) {
+function parseSubtitle(film, callback) {
+    getSubtitle(film, function(subtitle) {
         var lines = subtitle.toString().split('\n');
         var intervals = [];
         var lastEmpty = true;
@@ -23,7 +23,7 @@ exports.parseSubtitle = function(film, callback) {
             line = line.trim();
             if (correctLine) {
                 correctLine = false;
-                intervals.push(exports.parseInterval(line));
+                intervals.push(parseInterval(line));
             } else if (!line.length) {
                 lastEmpty = true;
             } else if (lastEmpty && line%1 === 0) {
@@ -32,26 +32,28 @@ exports.parseSubtitle = function(film, callback) {
             }
         });
 
-        callback(intervals);
-    });
-},
+        var binary = toBinary(intervals, BIT_LENGTH);
 
-exports.parseInterval = function(interval) {
+        callback(binary);
+    });
+}
+
+function parseInterval(interval) {
     var array = interval.split(' ');
     interval = {};
-    interval.start = exports.parseTime(array[0]);
-    interval.end = exports.parseTime(array[2]);
+    interval.start = parseTime(array[0]);
+    interval.end = parseTime(array[2]);
 
     return interval;
-},
+}
 
-exports.parseTime = function(time) {
+function parseTime(time) {
     time = time.replace(',', ':');
     var parsed = (Date.parse(DATE + " " + time) + 60*60*1000);
     return parsed;
-},
+}
 
-exports.toBinary = function(intervals, bitLength) {
+function toBinary(intervals, bitLength) {
     var current = 1;
     var binary = [current];
     var previousEnd = 0;
@@ -62,26 +64,26 @@ exports.toBinary = function(intervals, bitLength) {
         var sub = Math.ceil(interval.end / bitLength) - Math.floor(interval.start / bitLength);
         previousEnd = interval.end;
 
-        binary = binary.concat(exports.addToBinary(binary.pop(), noSub, false));
-        binary = binary.concat(exports.addToBinary(binary.pop(), sub, true));
+        binary = binary.concat(addToBinary(binary.pop(), noSub, false));
+        binary = binary.concat(addToBinary(binary.pop(), sub, true));
     });
 
     return binary;
-},
+}
 
-exports.addToBinary = function(binary, length, value) {
+function addToBinary(binary, length, value) {
     var binaryLength = Math.ceil(Math.log2(binary + 1));
 
     if (length + binaryLength <= BITS_PER_POSITION) {
-        return [exports.bitShift(binary, length, value)];
+        return [bitShift(binary, length, value)];
     } else {
         var spaceLeft = BITS_PER_POSITION - binaryLength;
-        var newBinaries = [exports.bitShift(binary, spaceLeft, value)];
-        return newBinaries.concat(exports.addToBinary(1, length-spaceLeft, value));
+        var newBinaries = [bitShift(binary, spaceLeft, value)];
+        return newBinaries.concat(addToBinary(1, length-spaceLeft, value));
     }
-},
+}
 
-exports.bitShift = function(binary, length, value) {
+function bitShift(binary, length, value) {
     if (value) {
         for (var i = 0; i < length; i++) {
             binary = (binary << 1) + 1;
@@ -92,4 +94,6 @@ exports.bitShift = function(binary, length, value) {
 
     return binary;
 }
+
+exports.parseSubtitle = parseSubtitle;
 

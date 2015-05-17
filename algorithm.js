@@ -3,15 +3,13 @@ var subs = require('./subtitles.js');
 
 db.openPool();
 
-exports.getResult = function(film1, film2, callback) {
+function getResult(film1, film2, callback) {
 	db.getResult(film1, film2, function(result, offset, shortFilm) {
 		if (result !== undefined) {
 			callback({overlap: result, offset: offset*subs.BITS_PER_POSITION, shortFilm: shortFilm, film: film2});
 		} else {
-            subs.parseSubtitle(film1, function(parsed1) {
-                subs.parseSubtitle(film2, function(parsed2) {
-                    var sub1 = subs.toBinary(parsed1, subs.BIT_LENGTH);
-                    var sub2 = subs.toBinary(parsed2, subs.BIT_LENGTH);
+            subs.parseSubtitle(film1, function(sub1) {
+                subs.parseSubtitle(film2, function(sub2) {
                     result = calculateOverlap(sub1, sub2, film1, film2);
 
                     callback(result);
@@ -80,3 +78,6 @@ function calculateLines(lines) {
     return line;
 }
 
+exports.getResult = getResult;
+
+getResult('chappie', 'chappie', console.log);
