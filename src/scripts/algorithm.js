@@ -1,5 +1,5 @@
-var db = require('./databaseHandler');
-var subs = require('./subtitleParser.js');
+var db = require('./databaseHandler'),
+    subs = require('./subtitleParser.js');
 
 db.open();
 

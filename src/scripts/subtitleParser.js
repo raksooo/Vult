@@ -1,6 +1,6 @@
-var fs = require('fs');
-var db = require('./databaseHandler');
-var scripts = require('./app.js');
+var fs = require('fs'),
+    db = require('./databaseHandler'),
+    scripts = require('./app.js');
 
 var DATE = '1970-01-01';
 var BITS_PER_POSITION = exports.BITS_PER_POSITION = 6; //offsetintervals

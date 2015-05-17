@@ -1,9 +1,9 @@
-var express = require('express');
-var mysql = require('mysql');
-var alg = require('./src/scripts/algorithm');
-var movies = require('./src/scripts/movies');
-var app = express();
-var scripts = require('./src/scripts/app.js');
+var express = require('express'),
+    mysql = require('mysql'),
+    alg = require('./src/scripts/algorithm'),
+    movies = require('./src/scripts/movies'),
+    scripts = require('./src/scripts/app.js'),
+    app = express();
 
 app.get('/', function (req, res) {
   res.sendfile(__dirname + '/src/static/index.html');
@@ -32,7 +32,6 @@ app.get('/getRecommendedMovies', function(req, res) {
 });
 
 var server = app.listen(9999, function () {
-
   var host = server.address().address;
   var port = server.address().port;
 
