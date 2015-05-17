@@ -74,7 +74,7 @@ function init() {
         con.query("USE Vult;", function() {
             con.query("SHOW TABLES LIKE 'Comparison'", function(err, rows, fields) {
                 if (!rows.length) {
-                    exports.createTable(con);
+                    createTable(con);
                 }
                 con.end();
                 open();
