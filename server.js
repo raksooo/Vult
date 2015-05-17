@@ -1,16 +1,18 @@
 var express = require('express'),
+    finalhandler = require('finalhandler'),
+    serveStatic = require('serve-static'),
     mysql = require('mysql'),
     alg = require('./src/scripts/algorithm'),
     movies = require('./src/scripts/movies'),
-    scripts = require('./src/scripts/app.js'),
-    app = express();
+    scripts = require('./src/scripts/app.js');
+
+var app = express();
+app.use("/static", express.static(__dirname + '/src/static'));
+var serve = serveStatic("./src/static/");
 
 app.get('/', function (req, res) {
-  res.sendfile(__dirname + '/src/static/index.html');
-});
-
-app.get('/styles.css', function (req, res) {
-  res.sendfile(__dirname + '/src/static/styles.css');
+    var done = finalhandler(req, res);
+    serve(req, res, done);
 });
 
 app.get('/getRecommendedMovies', function(req, res) {
