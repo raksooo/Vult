@@ -1,11 +1,9 @@
 var express = require('express'),
     finalhandler = require('finalhandler'),
     serveStatic = require('serve-static'),
-    mysql = require('mysql'),
     alg = require('./src/scripts/algorithm'),
     db = require('./src/scripts/databaseHandler'),
-    movies = require('./src/scripts/movies'),
-    scripts = require('./src/scripts/app.js');
+    movies = require('./src/scripts/movies');
 
 var app = express();
 app.use(express.static(__dirname + '/src/static'));
@@ -28,6 +26,10 @@ app.get('/getRecommendedMovies', function(req, res) {
       }
     });
   }
+});
+
+app.get('/imFeelingLucky', function(req, res) {
+    res.end("later...");
 });
 
 var server = app.listen(9999, function () {

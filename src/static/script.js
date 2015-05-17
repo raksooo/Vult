@@ -1,4 +1,6 @@
 function getRecommendation() {
+    document.getElementById("result").innerHTML = "";
+
     movie = document.getElementById("movie");
     xmlhttp = new XMLHttpRequest();
     xmlhttp.open("GET", "getRecommendedMovies?film=" + movie.value, false);
@@ -27,5 +29,13 @@ function getRecommendation() {
 
         document.getElementById("result").appendChild(list);
     };
+}
+
+function imFeelingLucky() {
+    var movie = document.getElementById("movie").value;
+    xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("GET", "imFeelingLucky?film=" + movie, false);
+    xmlhttp.send();
+    document.getElementById("result").innerHTML = xmlhttp.response;
 }
 
