@@ -6,11 +6,11 @@ var app = express();
 var scripts = require('./scripts/app.js');
 
 app.get('/', function (req, res) {
-  res.sendfile(__dirname + '/index.html');
+  res.sendfile(__dirname + '/src/static/index.html');
 });
 
 app.get('/styles.css', function (req, res) {
-  res.sendfile(__dirname + '/styles.css');
+  res.sendfile(__dirname + '/src/static/styles.css');
 });
 
 app.get('/getRecommendedMovies', function(req, res) {
