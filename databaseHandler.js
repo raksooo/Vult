@@ -10,7 +10,7 @@ var CREATE_SUBS = "CREATE TABLE Subs (Film varchar(255), Data TEXT);";
 var INSERT_SUBS = "INSERT INTO Subs VALUES (?,?);";
 var GET_SUBS = "SELECT Data FROM Subs WHERE Film = ?;";
 
-exports.openPool = function() {
+exports.open = function() {
   connection = mysql.createConnection({
         host: 'localhost',
         user: 'root',
@@ -20,7 +20,7 @@ exports.openPool = function() {
     connection.connect();
 }
 
-exports.closePool = function() {
+exports.close = function() {
     connection.end();
 }
 

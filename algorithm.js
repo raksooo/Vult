@@ -1,17 +1,19 @@
 var db = require('./databaseHandler');
 var subs = require('./subtitles.js');
 
-db.openPool();
 
 function getResult(film1, film2, callback) {
+    db.open();
 	db.getResult(film1, film2, function(result, offset, shortFilm) {
 		if (result !== undefined) {
 			callback({overlap: result, offset: offset*subs.BITS_PER_POSITION, shortFilm: shortFilm, film: film2});
+            db.close();
 		} else {
             subs.getSubtitleBinary(film1, function(sub1) {
                 subs.getSubtitleBinary(film2, function(sub2) {
                     result = calculateOverlap(sub1, sub2, film1, film2);
                     callback(result);
+                    db.close();
                 });
             });
         }
