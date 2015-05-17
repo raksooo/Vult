@@ -1,4 +1,5 @@
 var fs = require('fs');
+var db = require('./databaseHandler');
 var scripts = require('./scripts/app.js');
 
 var DATE = '1970-01-01';
@@ -13,28 +14,35 @@ function getSubtitle(film, callback) {
 }
 
 function parseSubtitle(film, callback) {
-    getSubtitle(film, function(subtitle) {
-        var lines = subtitle.toString().split('\n');
-        var intervals = [];
-        var lastEmpty = true;
-        var correctLine = false;
+    db.getSub(film, function(binary) {
+        if (binary !== undefined) {
+            callback(binary);
+        } else {
+            getSubtitle(film, function(subtitle) {
+                var lines = subtitle.toString().split('\n');
+                var intervals = [];
+                var lastEmpty = true;
+                var correctLine = false;
 
-        lines.forEach(function(line) {
-            line = line.trim();
-            if (correctLine) {
-                correctLine = false;
-                intervals.push(parseInterval(line));
-            } else if (!line.length) {
-                lastEmpty = true;
-            } else if (lastEmpty && line%1 === 0) {
-                correctLine = true;
-                lastEmpty = false;
-            }
-        });
+                lines.forEach(function(line) {
+                    line = line.trim();
+                    if (correctLine) {
+                        correctLine = false;
+                        intervals.push(parseInterval(line));
+                    } else if (!line.length) {
+                        lastEmpty = true;
+                    } else if (lastEmpty && line%1 === 0) {
+                        correctLine = true;
+                        lastEmpty = false;
+                    }
+                });
 
-        var binary = toBinary(intervals, BIT_LENGTH);
+                var binary = toBinary(intervals, BIT_LENGTH);
+                db.insertSub(film, binary);
 
-        callback(binary);
+                callback(binary);
+            });
+        }
     });
 }
 
