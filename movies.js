@@ -1,1 +1,0 @@
-exports.movies = ["Nyckeln till frihet", "Braveheart", "Toy Story 3", "Rang De Basanti", "Skuggor över södern", "Requiem for a Dream", "Lawrence av Arabien", "A Clockwork Orange", "Cykeltjuven", "Munna Bhai M.B.B.S.", "Bhaag Milkha Bhaag", "Chaplins pojke", "De hänsynslösa", "Eternal Sunshine of the Spotless Mind", "Taxi Driver"];

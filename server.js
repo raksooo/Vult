@@ -1,7 +1,7 @@
 var express = require('express');
 var mysql = require('mysql');
-var alg = require('./algorithm');
-var movies = require('./movies');
+var alg = require('./scripts/algorithm');
+var movies = require('./scripts/movies');
 var app = express();
 var scripts = require('./scripts/app.js');
 
