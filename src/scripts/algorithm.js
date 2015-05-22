@@ -2,18 +2,26 @@ var db = require('./databaseHandler'),
     subs = require('./subtitleParser.js');
 
 function getResult(film1, film2, callback) {
-	db.getResult(film1, film2, function(result, offset, shortFilm) {
-		if (result !== undefined) {
-			callback({overlap: result, offset: offset*subs.BITS_PER_POSITION, shortFilm: shortFilm, film: film2});
-		} else {
-            subs.getSubtitleBinary(film1, function(sub1) {
-                subs.getSubtitleBinary(film2, function(sub2) {
-                    result = calculateOverlap(sub1, sub2, film1, film2);
-                    callback(result);
+    if (film1 === undefined || film2 === undefined) {
+        callback(undefined);
+    } else {
+        db.getResult(film1, film2, function(result, offset, shortFilm) {
+            if (result !== undefined) {
+                callback({overlap: result, offset: offset*subs.BITS_PER_POSITION, shortFilm: shortFilm, film: film2});
+            } else {
+                subs.getSubtitleBinary(film1, function(sub1) {
+                    subs.getSubtitleBinary(film2, function(sub2) {
+                        if (sub1 === undefined || sub2 === undefined) {
+                            callback(undefined);
+                        } else {
+                            result = calculateOverlap(sub1, sub2, film1, film2);
+                            callback(result);
+                        }
+                    });
                 });
-            });
-        }
-	});
+            }
+        });
+    }
 }
 
 function compare(longer, shorter, offset) {

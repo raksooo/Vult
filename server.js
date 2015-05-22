@@ -3,6 +3,7 @@ var express = require('express'),
     serveStatic = require('serve-static'),
     alg = require('./src/scripts/algorithm'),
     db = require('./src/scripts/databaseHandler'),
+    api = require('./src/scripts/apiCommunicator')
     movies = require('./src/scripts/movies');
 
 var app = express();
@@ -11,21 +12,23 @@ app.use(express.static(__dirname + '/src/static'));
 db.init();
 
 app.get('/getRecommendedMovies', function(req, res) {
-  var data = [];
-  var length = movies.movies.length;
-  for (var i = 0; i < movies.movies.length ; i++) {
-    movieName = movies.movies[i];
-    alg.getResult(req.query.film, movieName, function(result) {
-      if (result == undefined) {
-        length--;
-      } else {
-          data[data.length] = result;
-      }
-      if (data.length == length) {
-        res.end(JSON.stringify(data));
-      }
+    api.searchMovie(req.query.film, function(original) {
+        var data = [];
+        var length = movies.movies.length;
+        for (var i = 0; i < movies.movies.length ; i++) {
+            alg.getResult(original.Title, movies.movies[i], function(result) {
+                console.log(data.length);
+                if (result == undefined) {
+                    length--;
+                } else {
+                    data.push(result);
+                }
+                if (data.length == length) {
+                    res.end(JSON.stringify(data));
+                }
+            });
+        }
     });
-  }
 });
 
 app.get('/imFeelingLucky', function(req, res) {
@@ -39,5 +42,4 @@ var server = app.listen(9999, function () {
   console.log('Server up and running', host, port);
 
 });
-
 

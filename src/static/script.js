@@ -13,18 +13,18 @@ function getRecommendation() {
 
         var list = document.createElement("ul");
         var offset = document.createElement("li");
-        var shortFilm = document.createElement("li");
+        //var shortFilm = document.createElement("li");
         var film = document.createElement("li");
         var overlap = document.createElement("li");
 
         offset.innerHTML = parsed.offset + 's';
-        shortFilm.innerHTML = parsed.shortFilm;
+        //shortFilm.innerHTML = parsed.shortFilm;
         film.innerHTML = parsed.film;
         overlap.innerHTML = Math.round(parsed.overlap*100) + '%';
 
         list.appendChild(overlap);
         list.appendChild(film);
-        list.appendChild(shortFilm);
+        //list.appendChild(shortFilm);
         list.appendChild(offset);
 
         document.getElementById("result").appendChild(list);

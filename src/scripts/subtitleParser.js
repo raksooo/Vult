@@ -1,29 +1,26 @@
 var fs = require('fs'),
     db = require('./databaseHandler'),
-    scripts = require('./app.js');
+    api = require('./apiCommunicator');
 
 var DATE = '1970-01-01';
 var BITS_PER_POSITION = exports.BITS_PER_POSITION = 6; //offsetintervals
 var BIT_LENGTH = 1000;
-
-function getSubtitle(film, callback) {
-    fs.readFile(__dirname + '/../../example_subtitle/chappie.srt', function(err, data) {
-        callback(data);
-    });
-    //scripts.init(film, callback);
-}
 
 function getSubtitleBinary(film, callback) {
     db.getSub(film, function(binary) {
         if (binary !== undefined) {
             callback(binary);
         } else {
-            getSubtitle(film, function(subtitle) {
-                var parsed = parseSubtitle(subtitle);
-                var binary = toBinary(parsed, BIT_LENGTH);
-                db.insertSub(film, binary);
+            api.getSubtitle(film, function(subtitle) {
+                if (subtitle === undefined) {
+                    callback(undefined);
+                } else {
+                    var parsed = parseSubtitle(subtitle);
+                    var binary = toBinary(parsed, BIT_LENGTH);
+                    db.insertSub(film, binary);
 
-                callback(binary);
+                    callback(binary);
+                }
             });
         }
     });
