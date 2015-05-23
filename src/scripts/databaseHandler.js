@@ -68,13 +68,13 @@ function init() {
     var con = mysql.createConnection({
         host: 'localhost',
         user: 'root',
-        password: ''
+        password: secret.password
     });
     con.connect();
     con.query("CREATE DATABASE IF NOT EXISTS Vult;", function() {
         con.query("USE Vult;", function() {
             con.query("SHOW TABLES LIKE 'Comparison'", function(err, rows, fields) {
-                if (!rows.length) {
+                if (!rows || !rows.length) {
                     createTable(con);
                 }
                 con.end();
