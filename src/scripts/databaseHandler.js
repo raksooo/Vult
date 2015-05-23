@@ -1,4 +1,5 @@
-var mysql = require('mysql');
+var mysql = require('mysql'),
+    secret = require('../../secret.js');
 
 var connection;
 
@@ -14,7 +15,7 @@ function open() {
   connection = mysql.createConnection({
         host: 'localhost',
         user: 'root',
-        password: '',
+        password: secret.password,
         database: 'Vult'
     });
     connection.connect();
