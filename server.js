@@ -24,6 +24,7 @@ app.get('/getRecommendedMovies', function(req, res) {
                     data.push(result);
                 }
                 if (data.length == length) {
+                    data.sort(sortFunction);
                     res.end(JSON.stringify(data));
                 }
             });
@@ -34,6 +35,10 @@ app.get('/getRecommendedMovies', function(req, res) {
 app.get('/imFeelingLucky', function(req, res) {
     res.end("later...");
 });
+
+function sortFunction(a, b) {
+    return a.overlap - b.overlap;
+}
 
 var server = app.listen(9999, function () {
   var host = server.address().address;
