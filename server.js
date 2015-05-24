@@ -3,7 +3,8 @@ var express = require('express'),
     serveStatic = require('serve-static'),
     alg = require('./src/scripts/algorithm'),
     db = require('./src/scripts/databaseHandler'),
-    api = require('./src/scripts/apiCommunicator')
+    api = require('./src/scripts/apiCommunicator'),
+    subs = require('./src/scripts/subtitleParser'),
     movies = require('./src/scripts/movies');
 
 var app = express();
@@ -12,22 +13,25 @@ app.use(express.static(__dirname + '/src/static'));
 db.init();
 
 app.get('/getRecommendedMovies', function(req, res) {
-    api.searchMovie(req.query.film, function(original) {
-        var data = [];
-        var length = movies.movies.length;
-        for (var i = 0; i < movies.movies.length ; i++) {
-            alg.getResult(original.Title, movies.movies[i], function(result) {
-                console.log(data.length);
-                if (result == undefined) {
-                    length--;
-                } else {
-                    data.push(result);
-                }
-                if (data.length == length) {
-                    data.sort(sortFunction);
-                    res.end(JSON.stringify(data));
-                }
-            });
+    prepareFirstMovie(req.query.film, function(original) {
+        if (!original) {
+            res.end("{}");
+        } else {
+            var data = [];
+            var length = movies.movies.length;
+            for (var i = 0; i < movies.movies.length ; i++) {
+                alg.getResult(original.Title, movies.movies[i], function(result) {
+                    if (result == undefined) {
+                        length--;
+                    } else {
+                        data.push(result);
+                    }
+                    if (data.length == length) {
+                        data.sort(sortFunction);
+                        res.end(JSON.stringify(data));
+                    }
+                });
+            }
         }
     });
 });
@@ -35,6 +39,14 @@ app.get('/getRecommendedMovies', function(req, res) {
 app.get('/imFeelingLucky', function(req, res) {
     res.end("later...");
 });
+
+function prepareFirstMovie(movie, callback) {
+    api.searchMovie(movie, function(original) {
+        subs.getSubtitleBinary(original.Title, function(sub) {
+            callback(original);
+        });
+    });
+}
 
 function sortFunction(a, b) {
     return a.overlap - b.overlap;
