@@ -25,9 +25,10 @@ function getSubtitle(movie, callback) {
 }
 
 function findSubtitle(movie, callback) {
+    console.log("download subtitle for ", movie);
     exec('subtitler "' + movie + '" -lang eng -n 1', function (error, stdout, stderr) {
         var result = stdout.toString().split('\n');
-        if (result.length < 9) {
+        if (result.length < 9 || result[7].substr(result[7].length - 3) !== 'srt') {
             callback(undefined);
         } else {
             var out = result[8];
