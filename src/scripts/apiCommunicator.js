@@ -1,4 +1,5 @@
 var request = require('request'),
+    opensubtitles = require('opensubtitles-client').api,
     exec = require('child_process').exec,
     zlib = require('zlib');
 
@@ -26,15 +27,14 @@ function getSubtitle(movie, callback) {
 
 function findSubtitle(movie, callback) {
     console.log("download subtitle for ", movie);
-    exec('subtitler "' + movie + '" -lang eng -n 1', function (error, stdout, stderr) {
-        var result = stdout.toString().split('\n');
-        if (result.length < 9 || result[7].substr(result[7].length - 3) !== 'srt') {
-            callback(undefined);
-        } else {
-            var out = result[8];
-            out = out.substring(out.indexOf('http'));
-            callback(out.trim());
-        }
+    opensubtitles.login().then(function(logintoken) {
+        opensubtitles.searchForTitle(logintoken, 'eng', movie).then(function(results) {
+            if (results.length && results[0].SubFormat === "srt") {
+                callback(results[0].SubDownloadLink);
+            } else {
+                callback(unefined);
+            }
+        });
     });
 }
 
