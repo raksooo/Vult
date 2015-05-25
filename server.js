@@ -20,7 +20,8 @@ app.get('/getRecommendedMovies', function(req, res) {
             var data = [];
             var length = movies.movies.length;
             for (var i = 0; i < movies.movies.length ; i++) {
-                alg.getResult(original.Title, movies.movies[i], function(result) {
+                var id = original.imdbID.substring(2);
+                alg.getResult(id, movies.movies[i], function(result) {
                     if (result == undefined) {
                         length--;
                     } else {

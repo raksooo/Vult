@@ -26,13 +26,24 @@ function getSubtitle(movie, callback) {
 }
 
 function findSubtitle(movie, callback) {
+    var params = {
+        imdbid: movie,
+        limit: 5
+    };
     console.log("download subtitle for ", movie);
     opensubtitles.login().then(function(logintoken) {
-        opensubtitles.searchForTitle(logintoken, 'eng', movie).then(function(results) {
-            if (results.length && results[0].SubFormat === "srt") {
-                callback(results[0].SubDownloadLink);
-            } else {
-                callback(unefined);
+        opensubtitles.search(logintoken, 'eng', params).then(function(results) {
+            var found;
+            for (var i=0; i<results.length; i++) {
+                r = results[i];
+                if (r.SubHearingImpaired === "0" && r.SubFormat === "srt") {
+                    callback(r.SubDownloadLink);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                callback(undefined);
             }
         });
     });
