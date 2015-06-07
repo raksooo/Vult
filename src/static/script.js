@@ -1,5 +1,16 @@
+var websocket = new WebSocket("ws://localhost:9999/");
+
+websocket.onmessage = function(event) {
+    console.log(event.data);
+}
+
 function getRecommendation() {
-    document.getElementById("result").innerHTML = "";
+    var data = {
+        type: 'recommended',
+        movie: document.getElementById('movie').value
+    }
+    websocket.send(JSON.stringify(data));
+    /*document.getElementById("result").innerHTML = "";
 
     movie = document.getElementById("movie");
     xmlhttp = new XMLHttpRequest();
@@ -28,7 +39,7 @@ function getRecommendation() {
         list.appendChild(offset);
 
         document.getElementById("result").appendChild(list);
-    };
+    };*/
 }
 
 function imFeelingLucky() {
