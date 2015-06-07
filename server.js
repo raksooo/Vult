@@ -16,7 +16,6 @@ db.init();
 
 app.ws('/', function(ws, req) {
     ws.on('message', function(message) {
-        console.log("incoming!", message);
         message = JSON.parse(message);
         if (message.type === 'recommended') {
             getRecommendedMovies(message.movie, function(result) {

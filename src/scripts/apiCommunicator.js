@@ -30,7 +30,6 @@ function findSubtitle(movie, callback) {
         imdbid: movie,
         limit: 5
     };
-    console.log("download subtitle for ", movie);
     opensubtitles.login().then(function(logintoken) {
         opensubtitles.search(logintoken, 'eng', params).then(function(results) {
             var found;
