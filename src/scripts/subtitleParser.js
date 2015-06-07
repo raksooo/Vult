@@ -15,11 +15,16 @@ function getSubtitleBinary(film, callback) {
                 if (subtitle === undefined) {
                     callback(undefined);
                 } else {
-                    var parsed = parseSubtitle(subtitle);
-                    var binary = toBinary(parsed, BIT_LENGTH);
-                    db.insertSub(film, binary);
-
-                    callback(binary);
+                    var binary;
+                    try {
+                        var parsed = parseSubtitle(subtitle);
+                        binary = toBinary(parsed, BIT_LENGTH);
+                        db.insertSub(film, binary);
+                        callback(binary);
+                    } catch(err) {
+                        console.error("Parse unsuccessful for", "http://imdb.com/title/tt" + film);
+                        callback(undefined);
+                    }
                 }
             });
         }

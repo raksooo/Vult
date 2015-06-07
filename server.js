@@ -30,7 +30,7 @@ function getRecommendedMovies(movie, callback) {
         if (!original) {
             callback("[]");
         } else {
-            var q = async.queue(compare, 3);
+            var q = async.queue(compare, 8);
             q.drain = function() {
                 callback("done");
             };
