@@ -15,10 +15,9 @@ function getSubtitleBinary(film, callback) {
                 if (subtitle === undefined) {
                     callback(undefined);
                 } else {
-                    var binary;
                     try {
                         var parsed = parseSubtitle(subtitle);
-                        binary = toBinary(parsed, BIT_LENGTH);
+                        var binary = toBinary(parsed, BIT_LENGTH);
                         db.insertSub(film, binary);
                         callback(binary);
                     } catch(err) {

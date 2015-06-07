@@ -1,6 +1,5 @@
 var request = require('request'),
     opensubtitles = require('opensubtitles-client').api,
-    exec = require('child_process').exec,
     zlib = require('zlib');
 
 function searchMovie(query, callback) {
@@ -50,7 +49,13 @@ function findSubtitle(movie, callback) {
 
 function downloadSubtitle(url, callback) {
     var sub = "";
-    request(url).pipe(zlib.createGunzip()).on('data', function(data) {
+    request(url).on('response', function(response) {
+        if (response.statusCode == 407) {
+            console.log("Slut för idag :(");
+        } else if (response.statusCode == 501) {
+            console.log("501");
+        }
+    }).pipe(zlib.createGunzip()).on('data', function(data) {
         sub += data.toString();
     }).on('end', function() {
         if (sub.trim().substring(0, 1) !== '1') {
@@ -58,8 +63,9 @@ function downloadSubtitle(url, callback) {
         } else {
             callback(sub);
         }
-    }).on('error', function() {
-        console.log('Slut för idag :(');
+    }).on('error', function(err) {
+        console.log("Error in downloadSubtitle");
+        callback(undefined);
     });
 }
 

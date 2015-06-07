@@ -30,14 +30,16 @@ function getRecommendedMovies(movie, callback) {
         if (!original) {
             callback("[]");
         } else {
+            var length = 0;
             var q = async.queue(compare, 8);
             q.drain = function() {
-                callback("done");
+                callback("done " + length);
             };
 
             for (var i = 0; i < movies.movies.length ; i++) {
                 q.push({original: original, other: movies.movies[i]}, function(result) {
                     if (result) {
+                        length++;
                         callback(JSON.stringify(result));
                     }
                 });
@@ -66,7 +68,7 @@ function prepareFirstMovie(movie, callback) {
 function compare(params, callback) {
     var originalId = params.original.imdbID.substring(2);
     api.searchMovie(params.other, function(other) {
-        if (other.imdbID) {
+        if (other.imdbID && params.original.imdbID !== other.imdbID) {
             var otherId = other.imdbID.substring(2);
             alg.getResult(originalId, otherId, function(result) {
                 callback(result);
