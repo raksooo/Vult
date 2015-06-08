@@ -7,7 +7,7 @@ function getResult(film1, film2, callback) {
     } else {
         db.getResult(film1, film2, function(result, offset, shortFilm) {
             if (result !== undefined) {
-                callback({overlap: result, offset: offset*subs.BITS_PER_POSITION, shortFilm: shortFilm, film: film2});
+                callback({overlap: result, offset: offset*subs.BITS_PER_POSITION, shortFilm: shortFilm});
             } else {
                 subs.getSubtitleBinary(film1, function(sub1) {
                     subs.getSubtitleBinary(film2, function(sub2) {
@@ -62,7 +62,7 @@ function calculateOverlap(sub1, sub2, film1, film2) {
     }
 
     db.insertResult(film1, film2, best, offset, shortFilm);
-    return {overlap: best, shortFilm: shortFilm, offset: offset*subs.BITS_PER_POSITION, film: film2};
+    return {overlap: best, shortFilm: shortFilm, offset: offset*subs.BITS_PER_POSITION};
 }
 
 function calculateLines(lines) {

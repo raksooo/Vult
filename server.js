@@ -19,7 +19,7 @@ app.ws('/', function(ws, req) {
         message = JSON.parse(message);
         if (message.type === 'recommended') {
             getRecommendedMovies(message.movie, function(result) {
-                ws.send(result);
+                ws.send(JSON.stringify(result));
             });
         }
     });
@@ -30,17 +30,20 @@ function getRecommendedMovies(movie, callback) {
         if (!original) {
             callback("[]");
         } else {
+            callback({status: "first", original: original});
+
+
             var length = 0;
             var q = async.queue(compare, 8);
             q.drain = function() {
-                callback("done " + length);
+                callback({status: "done", length: length});
             };
 
             for (var i = 0; i < movies.movies.length ; i++) {
                 q.push({original: original, other: movies.movies[i]}, function(result) {
                     if (result) {
                         length++;
-                        callback(JSON.stringify(result));
+                        callback(result);
                     }
                 });
             }
@@ -71,6 +74,10 @@ function compare(params, callback) {
         if (other.imdbID && params.original.imdbID !== other.imdbID) {
             var otherId = other.imdbID.substring(2);
             alg.getResult(originalId, otherId, function(result) {
+                if (result) {
+                    result.film = other;
+                    result.status = "film";
+                }
                 callback(result);
             });
         } else {
