@@ -8,16 +8,26 @@
     	<!-- Fonts -->
         <link href='http://fonts.googleapis.com/css?family=Rajdhani:300|Josefin+Sans:100|Advent+Pro:100|Roboto:300' rel='stylesheet' type='text/css'>
     </head>
-    <body>
-    	<header>
-    		<h1>Vult</h1>
-    	</header>
-        <main>
-        	<p>Pick a movie!</p>
-            <input type="text" id="movie" onkeydown="if (event.keyCode == 13) { getRecommendation(); }" /><br />
-        	<input type="submit" onClick="imFeelingLucky()" value="imFeelingLucky!" />
-        	<input type="submit" onClick="getRecommendation()" value="Get match!" />
-        	<div id="result"></div>
-        </main>
+    <body onload="init();">
+        <section id="search" class="initial">
+            <header>
+                <h1>Vult</h1>
+            </header>
+            <div>
+                <p>Pick a movie!</p>
+                <input type="text" id="movie" onkeydown="if (event.keyCode == 13) { getRecommendation(); }" /><br />
+                <!--<input type="submit" onClick="imFeelingLucky()" value="imFeelingLucky!" />-->
+                <input type="submit" id="getMatch" onClick="getRecommendation()" value="Get match!" />
+            </div>
+        </section>
+        <section id="result">
+            <div id="template">
+                <span class="title"></span>
+                <span class="overlap"></span>
+                <span class="offset"></span>
+            </div>
+            <ul>
+            </ul>
+        </section>
     </body>
 </html>

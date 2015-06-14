@@ -1,5 +1,23 @@
 header, main, footer { display: block; }
 
+html, body {
+    padding: 0;
+    margin: 0;
+}
+
+section {
+    width: 50%;
+    float: left;
+}
+
+section#search {
+    transition: width 500ms linear;
+}
+
+section#search.initial {
+    width: 100%;
+}
+
 header {
     width: 40%;
     height: 20%;
@@ -14,27 +32,25 @@ header h1 {
     text-align: center;
 }
 
-main {
-    width: 40%;
+section#search div {
     margin: 0 auto;
     text-align: center;
     font-family: "Roboto";
 }
 
-main p {
-	margin-bottom: 10;
-}
-
-main input {
+section#search div input {
 	margin-top: 5px;
 }
 
-main ul {
+section#result ul {
 	list-style: none;
     padding-left: 0;
 }
 
-main ul li {
-	display: inline;
-	margin-left: 10px;
+section#result ul li {
+    padding: 5px 0;
+}
+
+section#result ul li .title {
+    display: block
 }
