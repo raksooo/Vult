@@ -6,16 +6,28 @@ html, body {
 }
 
 section {
+    box-sizing: border-box;
+    margin: 100px 0;
     width: 50%;
     float: left;
 }
 
 section#search {
-    transition: width 500ms linear;
+    transition: width 300ms linear;
+}
+
+section#result {
+    padding: 0 30px;
+    border-left: 1px black solid;
+    transition: opacity 300ms linear;
 }
 
 section#search.initial {
     width: 100%;
+}
+
+section#result.initial {
+    opacity: 0;
 }
 
 header {
@@ -38,10 +50,6 @@ section#search div {
     font-family: "Roboto";
 }
 
-section#search div input {
-	margin-top: 5px;
-}
-
 section#result ul {
 	list-style: none;
     padding-left: 0;
@@ -53,4 +61,43 @@ section#result ul li {
 
 section#result ul li .title {
     display: block
+}
+
+section#search input {
+    display: block;
+	height: 50px;
+	font-size: 1.5em;
+	margin: 0 auto;
+    transition: opacity 300ms linear;
+}
+
+section#search input:disabled {
+    opacity: 0.3;
+}
+
+section#search input[type="text"] {
+	overflow: hidden;
+	width: 300px;
+	border: 1px #777777 solid;
+	padding: 0 0.5em;
+}
+
+section#search input:focus {
+	outline: 0;
+}
+
+section#search input[type="submit"] {
+    border-radius: 0;
+	border: 1px #777777 solid;
+    border-top: 0;
+	width: calc(300px + 1em + 2px);
+    background-color: #2ecc71;
+    font-family: inherit;
+    font-style: inherit;
+    font-weight: 200;
+    transition: background-color 40ms linear;
+}
+
+section#search input[type="submit"]:active {
+    background-color: #27ae60;
 }

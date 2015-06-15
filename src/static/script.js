@@ -64,9 +64,9 @@ function enableForm() {
 }
 
 function getRecommendation() {
-    var initial = document.querySelector('.initial');
-    if (initial) {
-        initial.classList.remove("initial");
+    var initial = document.querySelectorAll('.initial');
+    for (var i=0; i<initial.length; i++) {
+        initial[i].classList.remove("initial");
     }
     document.querySelector('#movie').setAttribute('disabled', 'disabled');
     document.querySelector('#getMatch').setAttribute('disabled', 'disabled');
