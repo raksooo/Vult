@@ -1,6 +1,7 @@
 var websocket = new WebSocket("ws://localhost:9999/");
 
 var template;
+var original;
 var results = [];
 
 websocket.onmessage = function(event) {
@@ -19,8 +20,9 @@ function init() {
     document.querySelector('#result').removeChild(template);
 }
 
-function addOriginal(original) {
-    var originalNode = template.cloneNode();
+function addOriginal(_original) {
+    original = _original;
+    var originalNode = document.createElement('h2');
     originalNode.innerHTML = template.innerHTML;
     originalNode.id = 'original';
     originalNode.querySelector('.title').innerHTML = original.Title;
@@ -47,7 +49,9 @@ function addFilm(data) {
     filmNode.className = 'film';
     filmNode.querySelector('.title').innerHTML = data.film.Title;
     filmNode.querySelector('.overlap').innerHTML = Math.round(data.overlap*100) + '%';
-    filmNode.querySelector('.offset').innerHTML = data.shortFilm + ' with ' + data.offset;
+
+    var shortFilm = 'tt' + data.shortFilm == data.film.imdbID ? data.film.Title : original.Title;
+    filmNode.querySelector('.offset').innerHTML = 'Offset ' + shortFilm + ' with ' + data.offset + 's';
 
     var ul = document.querySelector('#result').querySelector('ul');
     var next = ul.childNodes[position];

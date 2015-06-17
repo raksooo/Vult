@@ -17,8 +17,8 @@ section#search {
 }
 
 section#result {
-    padding: 0 30px;
-    border-left: 1px black solid;
+    padding: 20px 30px;
+    border-left: 1px darkgrey solid;
     transition: opacity 300ms linear;
 }
 
@@ -42,6 +42,7 @@ header h1 {
     font-weight: 100;
     width: 100%;
     text-align: center;
+    margin: 0.6em 0;
 }
 
 section#search div {
@@ -55,8 +56,11 @@ section#result ul {
     padding-left: 0;
 }
 
-section#result ul li {
-    padding: 5px 0;
+section#result ul li, section#result > h2 {
+    margin: 0;
+    width: 300px;
+    padding: 5px 10px;
+    border-bottom: 1px lightgrey solid;
 }
 
 section#result ul li .title {
