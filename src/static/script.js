@@ -1,4 +1,4 @@
-var websocket = new WebSocket("ws://localhost:9999/");
+//var websocket = new WebSocket("ws://localhost:9999/");
 
 var template;
 var original;

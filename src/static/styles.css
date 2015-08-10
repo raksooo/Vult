@@ -97,7 +97,7 @@ section#search input[type="submit"] {
 	width: calc(300px + 1em + 2px);
     background-color: #2ecc71;
     font-family: inherit;
-    font-style: inherit;
+    font-style: italic;
     font-weight: 200;
     transition: background-color 40ms linear;
 }
